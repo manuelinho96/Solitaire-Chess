@@ -79,7 +79,7 @@ def dibujarMenu(titulo, opciones, orientacion,xtitulo,ytitulo,xopcion,yopcion,xi
 def PartidaNueva():
     #Precondicion: True
     #Postcondicion:
-    ventana.fill(color_cielo)
+    ventana.blit(imagenFondo, (0, 0))
     dibujarMenu("seleccionarnivel", ["facil", "dificil", "muydificil", "entrenamiento","volver"], "vertical",
                 100,30,200,150,150,450)
     while True:
@@ -92,7 +92,7 @@ def PartidaNueva():
 def ConfirmacionSalida():
     #Precondicion: True
     #Postcondicion: True
-    ventana.fill(color_cielo)
+    ventana.blit(imagenFondo, (0, 0))
     dibujarMenu("salida",["si","no"],"horizontal",100,30,112,279,138,464)
     while True:
         pygame.display.update()
@@ -109,7 +109,7 @@ def MenuPrincipal():
     #precondicion true
     #mostrar opciones al usuario
     while True:
-        ventana.fill(color_cielo)
+        ventana.blit(imagenFondo, (0,0))
         ventana.blit(imagenTitulo, (150, 20))
         pygame.display.update()
         dibujarMenu("menuprincipal", ["partidanueva", "cargarpartida", "mostrarrecords", "salirjuego"], "vertical",
@@ -136,5 +136,6 @@ ventana = pygame.display.set_mode((600,600))
 pygame.display.set_caption("Solitaire Chess")
 imagenTablero = pygame.image.load("sources/sprites/tablero.jpg")
 imagenTitulo = pygame.transform.scale(pygame.image.load("sources/sprites/title.png"), (300,150))
+imagenFondo = pygame.image.load("sources/sprites/fondo.jpg")
 fuente = pygame.font.Font(None, 28)
 MenuPrincipal()
