@@ -117,8 +117,8 @@ def PartidaNueva():
                 100,30,200,150,150,450)
     while True:
         pygame.display.update()
-        #opcion = Leer(415, 465, color_lectura, 1, 440, 486)
-        opcion = "1"
+        opcion = Leer(415, 465, color_lectura, 1, 440, 486)
+        #opcion = "1"
         if opcion == "5":
             break
         elif opcion == "1" or opcion == "2" or opcion == "4":
@@ -185,8 +185,8 @@ def IntroducirNivel():
         ventana.blit(imagenTexto, (10,346))
         ventana.blit(imagenNivel, (100,100))
         pygame.display.update()
-        #nivel = Leer(20, 356, color_lectura, 44, 580,378)
-        nivel = "Cc4-a2-Rd3"
+        nivel = Leer(20, 356, color_lectura, 44, 580,378)
+        #nivel = "Cc4-a2-Rd3"
         #postcondicion nivel no es vacio
         try:
             assert(len(nivel) > 0)
@@ -232,8 +232,7 @@ def MenuPrincipal():
         dibujarMenu("menuprincipal", ["partidanueva", "cargarpartida", "mostrarrecords", "salirjuego"], "vertical",
                     100, 180, 200, 300, 150, 540)
         pygame.display.update()
-        #opcion = Leer(415,555, color_lectura,1,440,575)
-        opcion = "1"
+        opcion = Leer(415,555, color_lectura,1,440,575)
         if opcion == "1":
             PartidaNueva()
         elif opcion == "2":
