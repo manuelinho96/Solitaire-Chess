@@ -80,11 +80,13 @@ def PartidaNueva():
     #Precondicion: True
     #Postcondicion:
     ventana.fill(color_cielo)
-    dibujarMenu("seleccionarnivel", ["facil", "dificil", "muydificil", "entrenamiento"], "vertical",
+    dibujarMenu("seleccionarnivel", ["facil", "dificil", "muydificil", "entrenamiento","volver"], "vertical",
                 100,30,200,150,150,400)
     while True:
         pygame.display.update()
         opcion = Leer(420, 416, color_lectura, 1, 444, 430)
+        if opcion == "5":
+            break
 
 #funcion que maneja el menu principal
 def MenuPrincipal():
