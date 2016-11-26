@@ -26,7 +26,7 @@ def Leer(x,y, color, longitud_maxima, xfinal, yfinal):
         pygame.display.update()
         pygame.draw.rect(ventana, (0, 0, 0), rectangulo)
         texto = fuente.render(string, 1, (255, 120, 255))
-        ventana.blit(texto, (x + 5, y + 1))
+        ventana.blit(texto, (x + 7, y + 1))
         for event in pygame.event.get():
             if event.type == QUIT:
                     cerrar()
@@ -103,7 +103,7 @@ def PartidaNueva():
                 100,30,200,150,150,450)
     while True:
         pygame.display.update()
-        opcion = Leer(420, 466, color_lectura, 1, 444, 480)
+        opcion = Leer(415, 465, color_lectura, 1, 440, 486)
         if opcion == "5":
             break
         elif opcion == "1" or opcion == "2" or opcion == "4":
@@ -117,7 +117,7 @@ def ConfirmacionSalida():
     dibujarMenu("salida",["si","no"],"horizontal",100,30,112,279,138,464)
     while True:
         pygame.display.update()
-        opcion = Leer(408, 480, color_lectura, 1, 432, 494)
+        opcion = Leer(403, 479, color_lectura, 1, 428, 500)
         if opcion == "1":
             cerrar()
         elif opcion == "2":
@@ -150,7 +150,7 @@ def MenuPrincipal():
         pygame.display.update()
         x = 10
         y = 10
-        opcion = Leer(420,556, color_lectura,1,444,570)
+        opcion = Leer(415,555, color_lectura,1,440,575)
         if opcion == "1":
             PartidaNueva()
         elif opcion == "2":
