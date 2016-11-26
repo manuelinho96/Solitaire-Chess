@@ -10,7 +10,7 @@ def cerrar():
 
 #funcion que detecta eventos y evalua si son teclas
 #y retorna la entrada del usuario
-def Leer(x,y, color, longitud_maxima,xfinal,yfinal):
+def Leer(x,y, color, longitud_maxima, xfinal, yfinal):
     #precondicion true
     string = ""
     patron = re.compile("^\w{1}$")
@@ -54,11 +54,12 @@ def formatearOpcion(opcion):
 
 
 #funcion que dibuja un menu y sus opciones
-def dibujarMenu(titulo, opciones):
+def dibujarMenu(titulo, opciones, orientacion):
     #precondicion al menos debe haber 1 opcion y el titulo debe no ser nulo
-    #y todas las opciones no deben ser nulas
+    #todas las opciones no deben ser nulas, la orientacion es vertical o horizontal
     try:
-        assert(len(opciones) > 0 and titulo != "" and all(opcion != "" for opcion in opciones))
+        assert(len(opciones) > 0 and titulo != "" and all(opcion != "" for opcion in opciones) and
+               (orientacion == "vertical" or orientacion == "horizontal"))
     except:
         print("Error con los datos del menu")
         cerrar()
@@ -68,7 +69,10 @@ def dibujarMenu(titulo, opciones):
     for opcion in opciones:
             imagenes.append(formatearOpcion(opcion))
     for i in range(len(imagenes)):
-        ventana.blit(imagenes[i], (200, 300 + (i * 60)))
+        if orientacion == "vertical":
+            ventana.blit(imagenes[i], (200, 300 + (i * 60)))
+        else:
+            ventana.blit(imagenes[i], (20 + (i * 210), 300))
     introduzca_opcion = pygame.transform.scale(pygame.image.load("sources/sprites/introduceunaopcion.png"),(300, 50))
     ventana.blit(introduzca_opcion, (150,540))
     #postcondicion true
@@ -82,14 +86,14 @@ def MenuPrincipal():
     ventana.fill(color_cielo)
     ventana.blit(imagenTitulo, (150,20))
     pygame.display.update()
-    dibujarMenu("menuprincipal", ["partidanueva", "cargarpartida", "mostrarrecords", "salirjuego"])
+    dibujarMenu("menuprincipal", ["partidanueva", "cargarpartida", "mostrarrecords", "salirjuego"], "vertical")
     pygame.display.update()
     x = 10
     y = 10
     while True:
         opcion = Leer(420,556, color_lectura,1,444,570)
         if opcion == "1":
-            print("JUGAR!")
+            jugar()
         elif opcion == "2":
             print("Cargar")
         elif opcion == "3":
@@ -106,4 +110,5 @@ pygame.display.set_caption("Solitaire Chess")
 imagenTablero = pygame.image.load("sources/sprites/tablero.jpg")
 imagenTitulo = pygame.transform.scale(pygame.image.load("sources/sprites/title.png"), (300,150))
 fuente = pygame.font.Font(None, 28)
+
 MenuPrincipal()
