@@ -111,11 +111,10 @@ def dibujarMenu(titulo, opciones, orientacion,xtitulo,ytitulo,xopcion,yopcion,xi
 #Funcion que maneja el menu de partida nueva
 def PartidaNueva():
     #Precondicion: True
-
-    ventana.blit(imagenFondo, (0, 0))
-    dibujarMenu("seleccionarnivel", ["facil", "dificil", "muydificil", "entrenamiento","volver"], "vertical",
-                100,30,200,150,150,450)
     while True:
+        ventana.blit(imagenFondo, (0, 0))
+        dibujarMenu("seleccionarnivel", ["facil", "dificil", "muydificil", "entrenamiento", "volver"], "vertical",
+                    100, 30, 200, 150, 150, 450)
         pygame.display.update()
         opcion = Leer(415, 465, color_lectura, 1, 440, 486)
         #opcion = "1"
