@@ -10,19 +10,25 @@ def cerrar():
 
 #funcion que detecta eventos y evalua si son teclas
 #y retorna la entrada del usuario
-def Leer(x,y, color, longitud_maxima):
+def Leer(x,y, color, longitud_maxima,xfinal,yfinal):
     #precondicion true
     string = ""
     patron = re.compile("^\w{1}$")
     patron2 = re.compile("\w")
+    rectangulo = pygame.Rect(x, y, xfinal - x, yfinal - y)
+    texto = ""
     while True:#(funcion de cota???, invariante???)
+        pygame.display.update()
+        pygame.draw.rect(ventana, (0, 0, 0), rectangulo)
+        texto = fuente.render(string, 1, (255, 120, 255))
+        ventana.blit(texto, (x+5, y-4))
         for event in pygame.event.get():
             if event.type == QUIT:
                     cerrar()
             if event.type == KEYDOWN:
                 print(event.key)
-                if patron.match(pygame.key.name(event.key)) != None or pygame.key.name(event.key) == "-" and \
-                                len(string) < longitud_maxima:
+                if ((patron.match(pygame.key.name(event.key)) != None or pygame.key.name(event.key) == "-") and
+                                len(string) < longitud_maxima):
                     # dibujar la letra, sumarle pixeles dependiendo de la longitud para que quede mas lejos la letra nueva
                     # recordar que se debe usar el color pasado por parametro
                     string += pygame.key.name(event.key)
@@ -37,7 +43,6 @@ def Leer(x,y, color, longitud_maxima):
                         cerrar()
                 elif event.key ==8 and len(string)>0:
                     string = string[:len(string)-1]
-
 
 #funcion que recibe un string del mensaje de la opcion
 #y carga el sprite correspondiente y lo lleva a resolucion
@@ -64,6 +69,8 @@ def dibujarMenu(titulo, opciones):
             imagenes.append(formatearOpcion(opcion))
     for i in range(len(imagenes)):
         ventana.blit(imagenes[i], (200, 300 + (i * 60)))
+    introduzca_opcion = pygame.transform.scale(pygame.image.load("sources/sprites/introduceunaopcion.png"),(300, 50))
+    ventana.blit(introduzca_opcion, (150,540))
     #postcondicion true
 
 #funcion que maneja el menu principal
@@ -80,7 +87,7 @@ def MenuPrincipal():
     x = 10
     y = 10
     while True:
-        opcion = Leer(x,y, color_lectura,1)
+        opcion = Leer(420,556, color_lectura,1,444,570)
         if opcion == "1":
             print("JUGAR!")
         elif opcion == "2":
@@ -98,5 +105,5 @@ ventana = pygame.display.set_mode((600,600))
 pygame.display.set_caption("Solitaire Chess")
 imagenTablero = pygame.image.load("sources/sprites/tablero.jpg")
 imagenTitulo = pygame.transform.scale(pygame.image.load("sources/sprites/title.png"), (300,150))
-fuente = pygame.font.Font(None, 36)
+fuente = pygame.font.Font(None, 28)
 MenuPrincipal()
