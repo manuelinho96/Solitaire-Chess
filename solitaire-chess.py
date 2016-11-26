@@ -14,7 +14,12 @@ def cerrar():
 #funcion que detecta eventos y evalua si son teclas
 #y retorna la entrada del usuario
 def Leer(x,y, color, longitud_maxima, xfinal, yfinal):
-    #precondicion true
+    #precondicion x,y,xfinal,yfinal deben estar entra 0 y 600, longitud maxima debe ser mayor o igual que 1
+    try:
+        assert(x >= 0 and x <= 600 and y >= 0 and y <= 600 and xfinal >= 0 and xfinal <= 600 and yfinal >= 0 \
+               and yfinal <= 600 and longitud_maxima >0 )
+    except:
+        print("error en los parametros")
     string = ""
     patron = re.compile("^\w{1}$")
     patron2 = re.compile("\w")
@@ -22,7 +27,7 @@ def Leer(x,y, color, longitud_maxima, xfinal, yfinal):
     texto = ""
     global shift
     global bloq_mayus
-    while True:#(funcion de cota???, invariante???)
+    while True:#
         pygame.display.update()
         pygame.draw.rect(ventana, (0, 0, 0), rectangulo)
         texto = fuente.render(string, 1, (255, 120, 255))
@@ -60,23 +65,31 @@ def Leer(x,y, color, longitud_maxima, xfinal, yfinal):
                     shift = False
                 elif event.key == 301:
                     bloq_mayus = False
+    #postcondicion true
 
 #funcion que recibe un string del mensaje de la opcion
 #y carga el sprite correspondiente y lo lleva a resolucion
 #150x50
 def formatearOpcion(opcion):
     #precondicion existe la imagen
-    return pygame.transform.scale(pygame.image.load("sources/sprites/" + opcion + ".png"), (200,50))
     #postcondicion true
+    try:
+        return pygame.transform.scale(pygame.image.load("sources/sprites/" + opcion + ".png"), (200,50))
+    except:
+        return "no se encontro la imagen"
+
 
 
 #funcion que dibuja un menu y sus opciones
 def dibujarMenu(titulo, opciones, orientacion,xtitulo,ytitulo,xopcion,yopcion,xintro,yintro):
     #precondicion al menos debe haber 1 opcion y el titulo debe no ser nulo
     #todas las opciones no deben ser nulas, la orientacion es vertical o horizontal
+    #xtitulo, ytitulo, xopcion, yopcion, xintro, yintro deben estar en 0 y 600
     try:
         assert(len(opciones) > 0 and titulo != "" and all(opcion != "" for opcion in opciones) and
                (orientacion == "vertical" or orientacion == "horizontal"))
+        assert(xtitulo >=0 and xtitulo <= 600 and ytitulo >=0 and ytitulo <= 600 and xopcion >=0 and xopcion <= 600 and
+               yopcion >= 0 and yopcion <= 600 and xintro >= 0 and xintro <= 600 and yintro >=0 and yintro <= 600)
     except:
         print("Error con los datos del menu")
         cerrar()
@@ -94,10 +107,11 @@ def dibujarMenu(titulo, opciones, orientacion,xtitulo,ytitulo,xopcion,yopcion,xi
     ventana.blit(introduzca_opcion, (xintro,yintro))
     #postcondicion true
 
+
 #Funcion que maneja el menu de partida nueva
 def PartidaNueva():
     #Precondicion: True
-    #Postcondicion:
+
     ventana.blit(imagenFondo, (0, 0))
     dibujarMenu("seleccionarnivel", ["facil", "dificil", "muydificil", "entrenamiento","volver"], "vertical",
                 100,30,200,150,150,450)
@@ -109,17 +123,17 @@ def PartidaNueva():
             break
         elif opcion == "1" or opcion == "2" or opcion == "4":
             nivel = IntroducirNivel()
-            print(validarString(nivel))
-            tablero = MatrizDeString(nivel)
-            print(tablero)
-            cerrar()
+            if validarString(nivel):
+                tablero = MatrizDeString(nivel)
+                cerrar()
+    #postcondicion true
 
 #funcion que determina si un string es un nivel de valido o no
 def validarString(string) -> bool:
     #precondicion la string debe tener al menos un caracter
     assert(len(string) >= 0)
     lista = string.split("-")
-    #postcondicion = la funcion debe retornar True si la string al separarla por -
+    #POSTCONDICION = la funcion debe retornar True si la string al separarla por -
     #se divide en substring de 2 o 3 caracteres, cuando tiene 2 caracteres el primero
     #debe ser una letra minuscula entra a..d y el segundo un numero del 1 al 4
     #y en caso de tener 3 caracteres el primero debe ser "R","T","C","A","D", el segundo
@@ -146,23 +160,24 @@ def validarString(string) -> bool:
 #Funcion que maneja la confirmacion de salida
 def ConfirmacionSalida():
     #Precondicion: True
-    #Postcondicion: True
     ventana.blit(imagenFondo, (0, 0))
     dibujarMenu("salida",["si","no"],"horizontal",100,30,112,279,138,464)
     while True:
         pygame.display.update()
         opcion = Leer(403, 479, color_lectura, 1, 428, 500)
-        if opcion == "1":
-            cerrar()
-        elif opcion == "2":
-            break
-        else:
+        #postcondicion opcion es 1 o 2
+        try:
+            assert(opcion == "1" or opcion == "2")
+            if opcion == "1":
+                cerrar()
+            elif opcion == "2":
+                break
+        except:
             print("opcion invalida")
 
 #funcion que maneja la pantalla en la que el usuario introduce el nivel desde el teclado
 def IntroducirNivel():
     #Precondicion: True
-    #Postcondicion: True
     imagenNivel = pygame.transform.scale(pygame.image.load("sources/sprites/configurartablero.png"), (400,200))
     while True:
         ventana.blit(imagenFondo, (0, 0))
@@ -172,6 +187,11 @@ def IntroducirNivel():
         pygame.display.update()
         #nivel = Leer(20, 356, color_lectura, 44, 580,378)
         nivel = "Cc4-a2-Rd3"
+        #postcondicion nivel no es vacio
+        try:
+            assert(len(nivel) > 0)
+        except:
+            print("Debe haber al menos un caracter en el nivel")
         return nivel
 
 #funcion que dado un string de nivel, retorna una matriz con el tablero
@@ -199,6 +219,7 @@ def MatrizDeString(string):
                 matriz[2][int(substring[1]) - 1] = "P"
             else:
                 matriz[3][int(substring[1]) - 1] = "P"
+    #postcondicion true
     return matriz
 
 #funcion que maneja el menu principal
@@ -211,8 +232,6 @@ def MenuPrincipal():
         dibujarMenu("menuprincipal", ["partidanueva", "cargarpartida", "mostrarrecords", "salirjuego"], "vertical",
                     100, 180, 200, 300, 150, 540)
         pygame.display.update()
-        x = 10
-        y = 10
         #opcion = Leer(415,555, color_lectura,1,440,575)
         opcion = "1"
         if opcion == "1":
@@ -225,6 +244,7 @@ def MenuPrincipal():
             ConfirmacionSalida()
         else:
             print("Error opcion invalida")
+        # post condicion true
 
 pygame.init()
 color_cielo = pygame.Color(25,158,218)
