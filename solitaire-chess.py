@@ -26,7 +26,7 @@ def Leer(x,y, color, longitud_maxima, xfinal, yfinal):
         pygame.display.update()
         pygame.draw.rect(ventana, (0, 0, 0), rectangulo)
         texto = fuente.render(string, 1, (255, 120, 255))
-        ventana.blit(texto, (x+5, y-4))
+        ventana.blit(texto, (x + 5, y + 1))
         for event in pygame.event.get():
             if event.type == QUIT:
                     cerrar()
@@ -35,11 +35,13 @@ def Leer(x,y, color, longitud_maxima, xfinal, yfinal):
                     shift = True
                 elif event.key == 301: #presionar bloq mayus
                     bloq_mayus = True
-                if ((patron.match(pygame.key.name(event.key)) != None or pygame.key.name(event.key) == "-") and
+                if ((patron.match(pygame.key.name(event.key)) != None or event.key == 47) and
                                 len(string) < longitud_maxima):
                     # dibujar la letra, sumarle pixeles dependiendo de la longitud para que quede mas lejos la letra nueva
                     # recordar que se debe usar el color pasado por parametro
                     letra = pygame.key.name(event.key)
+                    if event.key == 47:
+                        letra = "-"
                     if shift != bloq_mayus:
                         letra = letra.upper()
                     string += letra
@@ -104,6 +106,8 @@ def PartidaNueva():
         opcion = Leer(420, 466, color_lectura, 1, 444, 480)
         if opcion == "5":
             break
+        elif opcion == "1" or opcion == "2" or opcion == "4":
+            IntroducirNivel()
 
 #Funcion que maneja la confirmacion de salida
 def ConfirmacionSalida():
@@ -121,6 +125,14 @@ def ConfirmacionSalida():
         else:
             print("opcion invalida")
 
+def IntroducirNivel():
+    while True:
+        ventana.blit(imagenFondo, (0, 0))
+        ventana.blit(imagenTitulo, (150, 20))
+        pygame.display.update()
+        nivel = Leer(20, 356, color_lectura, 50, 580,378)
+
+
 #funcion que maneja el menu principal
 def MenuPrincipal():
     #precondicion true
@@ -128,7 +140,6 @@ def MenuPrincipal():
     while True:
         ventana.blit(imagenFondo, (0,0))
         ventana.blit(imagenTitulo, (150, 20))
-        pygame.display.update()
         dibujarMenu("menuprincipal", ["partidanueva", "cargarpartida", "mostrarrecords", "salirjuego"], "vertical",
                     100, 180, 200, 300, 150, 540)
         pygame.display.update()
@@ -138,9 +149,9 @@ def MenuPrincipal():
         if opcion == "1":
             PartidaNueva()
         elif opcion == "2":
-            print("Cargar")
+            print("Cargar!")
         elif opcion == "3":
-            print("Records")
+            print("Records!")
         elif opcion == "4":
             ConfirmacionSalida()
         else:
