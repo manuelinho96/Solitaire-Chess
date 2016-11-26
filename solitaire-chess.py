@@ -1,6 +1,9 @@
 import pygame, sys, re
 from pygame.locals import *
 
+shift = False #variable booleana que indica el estado de la tecla shift
+bloq_mayus = False #variable booleana que indica el estado de la tecla bloq mayus del teclado
+
 #funcion que cierra pygame y cierra el programa
 def cerrar():
     #precondicion true
@@ -17,6 +20,8 @@ def Leer(x,y, color, longitud_maxima, xfinal, yfinal):
     patron2 = re.compile("\w")
     rectangulo = pygame.Rect(x, y, xfinal - x, yfinal - y)
     texto = ""
+    global shift
+    global bloq_mayus
     while True:#(funcion de cota???, invariante???)
         pygame.display.update()
         pygame.draw.rect(ventana, (0, 0, 0), rectangulo)
@@ -26,12 +31,19 @@ def Leer(x,y, color, longitud_maxima, xfinal, yfinal):
             if event.type == QUIT:
                     cerrar()
             if event.type == KEYDOWN:
+                if event.key == 304: #presionar shift
+                    shift = True
+                elif event.key == 301: #presionar bloq mayus
+                    bloq_mayus = True
                 if ((patron.match(pygame.key.name(event.key)) != None or pygame.key.name(event.key) == "-") and
                                 len(string) < longitud_maxima):
                     # dibujar la letra, sumarle pixeles dependiendo de la longitud para que quede mas lejos la letra nueva
                     # recordar que se debe usar el color pasado por parametro
-                    string += pygame.key.name(event.key)
-                elif event.key == 13:
+                    letra = pygame.key.name(event.key)
+                    if shift != bloq_mayus:
+                        letra = letra.upper()
+                    string += letra
+                elif event.key == 13:# presionar enter
                     #postcondicion string solo contiene elementos validos
                     try:
                         assert(patron2.match(string) != None or len(string) == 0)
@@ -39,8 +51,13 @@ def Leer(x,y, color, longitud_maxima, xfinal, yfinal):
                     except:
                         print("Error en la lectura")
                         cerrar()
-                elif event.key ==8 and len(string)>0:
+                elif event.key == 8 and len(string) > 0: #presionar backspace
                     string = string[:len(string)-1]
+            elif event.type == KEYUP:
+                if event.key == 304:
+                    shift = False
+                elif event.key == 301:
+                    bloq_mayus = False
 
 #funcion que recibe un string del mensaje de la opcion
 #y carga el sprite correspondiente y lo lleva a resolucion
