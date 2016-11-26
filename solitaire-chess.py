@@ -26,7 +26,6 @@ def Leer(x,y, color, longitud_maxima, xfinal, yfinal):
             if event.type == QUIT:
                     cerrar()
             if event.type == KEYDOWN:
-                print(event.key)
                 if ((patron.match(pygame.key.name(event.key)) != None or pygame.key.name(event.key) == "-") and
                                 len(string) < longitud_maxima):
                     # dibujar la letra, sumarle pixeles dependiendo de la longitud para que quede mas lejos la letra nueva
@@ -36,7 +35,6 @@ def Leer(x,y, color, longitud_maxima, xfinal, yfinal):
                     #postcondicion string solo contiene elementos validos
                     try:
                         assert(patron2.match(string) != None or len(string) == 0)
-                        print(string)
                         return string
                     except:
                         print("Error en la lectura")
@@ -54,7 +52,7 @@ def formatearOpcion(opcion):
 
 
 #funcion que dibuja un menu y sus opciones
-def dibujarMenu(titulo, opciones, orientacion):
+def dibujarMenu(titulo, opciones, orientacion,xtitulo,ytitulo,xopcion,yopcion,xintro,yintro):
     #precondicion al menos debe haber 1 opcion y el titulo debe no ser nulo
     #todas las opciones no deben ser nulas, la orientacion es vertical o horizontal
     try:
@@ -64,36 +62,46 @@ def dibujarMenu(titulo, opciones, orientacion):
         print("Error con los datos del menu")
         cerrar()
     titulo_menu = pygame.transform.scale(pygame.image.load("sources/sprites/" + titulo + ".png"), (400, 100))
-    ventana.blit(titulo_menu, (100, 180))
+    ventana.blit(titulo_menu, (xtitulo,ytitulo))
     imagenes = []
     for opcion in opciones:
             imagenes.append(formatearOpcion(opcion))
     for i in range(len(imagenes)):
         if orientacion == "vertical":
-            ventana.blit(imagenes[i], (200, 300 + (i * 60)))
+            ventana.blit(imagenes[i], (xopcion, yopcion + (i * 60)))
         else:
-            ventana.blit(imagenes[i], (20 + (i * 210), 300))
+            ventana.blit(imagenes[i], (xopcion + (i * 210), yopcion))
     introduzca_opcion = pygame.transform.scale(pygame.image.load("sources/sprites/introduceunaopcion.png"),(300, 50))
-    ventana.blit(introduzca_opcion, (150,540))
+    ventana.blit(introduzca_opcion, (xintro,yintro))
     #postcondicion true
+
+#Funcion que maneja el menu de partida nueva
+def PartidaNueva():
+    #Precondicion: True
+    #Postcondicion:
+    ventana.fill(color_cielo)
+    dibujarMenu("seleccionarnivel", ["facil", "dificil", "muydificil", "entrenamiento"], "vertical",
+                100,30,200,150,150,400)
+    while True:
+        pygame.display.update()
+        opcion = Leer(420, 416, color_lectura, 1, 444, 430)
 
 #funcion que maneja el menu principal
 def MenuPrincipal():
     #precondicion true
     #mostrar opciones al usuario
-    color_cielo = pygame.Color(25,158,218)
-    color_lectura = pygame.Color(147,55,120)
     ventana.fill(color_cielo)
     ventana.blit(imagenTitulo, (150,20))
     pygame.display.update()
-    dibujarMenu("menuprincipal", ["partidanueva", "cargarpartida", "mostrarrecords", "salirjuego"], "vertical")
+    dibujarMenu("menuprincipal", ["partidanueva", "cargarpartida", "mostrarrecords", "salirjuego"], "vertical",
+                100,180,200,300,150,540)
     pygame.display.update()
     x = 10
     y = 10
     while True:
         opcion = Leer(420,556, color_lectura,1,444,570)
         if opcion == "1":
-            jugar()
+            PartidaNueva()
         elif opcion == "2":
             print("Cargar")
         elif opcion == "3":
@@ -105,10 +113,11 @@ def MenuPrincipal():
             print("Error opcion invalida")
 
 pygame.init()
+color_cielo = pygame.Color(25,158,218)
+color_lectura = pygame.Color(147, 55, 120)
 ventana = pygame.display.set_mode((600,600))
 pygame.display.set_caption("Solitaire Chess")
 imagenTablero = pygame.image.load("sources/sprites/tablero.jpg")
 imagenTitulo = pygame.transform.scale(pygame.image.load("sources/sprites/title.png"), (300,150))
 fuente = pygame.font.Font(None, 28)
-
 MenuPrincipal()
