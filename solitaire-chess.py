@@ -103,11 +103,45 @@ def PartidaNueva():
                 100,30,200,150,150,450)
     while True:
         pygame.display.update()
-        opcion = Leer(415, 465, color_lectura, 1, 440, 486)
+        #opcion = Leer(415, 465, color_lectura, 1, 440, 486)
+        opcion = "1"
         if opcion == "5":
             break
         elif opcion == "1" or opcion == "2" or opcion == "4":
-            IntroducirNivel()
+            nivel = IntroducirNivel()
+            print(validarString(nivel))
+            tablero = MatrizDeString(nivel)
+            print(tablero)
+            cerrar()
+
+#funcion que determina si un string es un nivel de valido o no
+def validarString(string) -> bool:
+    #precondicion la string debe tener al menos un caracter
+    assert(len(string) >= 0)
+    lista = string.split("-")
+    #postcondicion = la funcion debe retornar True si la string al separarla por -
+    #se divide en substring de 2 o 3 caracteres, cuando tiene 2 caracteres el primero
+    #debe ser una letra minuscula entra a..d y el segundo un numero del 1 al 4
+    #y en caso de tener 3 caracteres el primero debe ser "R","T","C","A","D", el segundo
+    #debe ser una letra minuscula de entra a..d y ultimo un numero del 1 al 4
+    #en ambos casos se debe retornar True, sino se retorna falso
+    try:
+        assert(all(len(substring) >= 2  and len(substring) <=3 for substring in lista))
+    except:
+        print("Error de cantidad de caracteres en los substrings")
+        return False
+    try:
+        for substring in lista:
+            if len(substring) == 2:
+                assert(substring[0] in ["a","b","c","d"] and substring[1] in ["1", "2", "3", "4"])
+            else:
+                assert (substring[1] in ["a", "b", "c", "d"] and substring[2] in ["1", "2", "3", "4"] \
+                        and substring[0] in ["R", "T", "C", "A", "D"])
+        return True
+    except:
+        print("Cantidad de carecteres no corresponde a los caracteres en el string")
+        return False
+
 
 #Funcion que maneja la confirmacion de salida
 def ConfirmacionSalida():
@@ -125,9 +159,10 @@ def ConfirmacionSalida():
         else:
             print("opcion invalida")
 
+#funcion que maneja la pantalla en la que el usuario introduce el nivel desde el teclado
 def IntroducirNivel():
     #Precondicion: True
-    #Postcondicion:
+    #Postcondicion: True
     imagenNivel = pygame.transform.scale(pygame.image.load("sources/sprites/configurartablero.png"), (400,200))
     while True:
         ventana.blit(imagenFondo, (0, 0))
@@ -135,8 +170,36 @@ def IntroducirNivel():
         ventana.blit(imagenTexto, (10,346))
         ventana.blit(imagenNivel, (100,100))
         pygame.display.update()
-        nivel = Leer(20, 356, color_lectura, 44, 580,378)
+        #nivel = Leer(20, 356, color_lectura, 44, 580,378)
+        nivel = "Cc4-a2-Rd3"
+        return nivel
 
+#funcion que dado un string de nivel, retorna una matriz con el tablero
+#equivalente al string
+def MatrizDeString(string):
+    #precondicion True
+    matriz = [["" for x in range(4)] for i in range(4)]
+    lista = string.split("-")
+    for substring in lista:
+        if len(substring) == 3:
+            if substring[1] == "a":
+                matriz[0][int(substring[2]) - 1] = substring[0]
+            elif substring[1] == "b":
+                matriz[1][int(substring[2]) - 1] = substring[0]
+            elif substring[1] == "c":
+                matriz[2][int(substring[2]) - 1] = substring[0]
+            else:
+                matriz[3][int(substring[2]) - 1] = substring[0]
+        else:
+            if substring[0] == "a":
+                matriz[0][int(substring[1]) - 1] = "P"
+            elif substring[0] == "b":
+                matriz[1][int(substring[1]) - 1] = "P"
+            elif substring[0] == "c":
+                matriz[2][int(substring[1]) - 1] = "P"
+            else:
+                matriz[3][int(substring[1]) - 1] = "P"
+    return matriz
 
 #funcion que maneja el menu principal
 def MenuPrincipal():
@@ -150,7 +213,8 @@ def MenuPrincipal():
         pygame.display.update()
         x = 10
         y = 10
-        opcion = Leer(415,555, color_lectura,1,440,575)
+        #opcion = Leer(415,555, color_lectura,1,440,575)
+        opcion = "1"
         if opcion == "1":
             PartidaNueva()
         elif opcion == "2":
