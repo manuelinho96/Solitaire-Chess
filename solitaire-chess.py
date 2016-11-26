@@ -165,13 +165,11 @@ def ConfirmacionSalida():
         pygame.display.update()
         opcion = Leer(403, 479, color_lectura, 1, 428, 500)
         #postcondicion opcion es 1 o 2
-        try:
-            assert(opcion == "1" or opcion == "2")
-            if opcion == "1":
-                cerrar()
-            elif opcion == "2":
-                break
-        except:
+        if opcion == "1":
+            cerrar()
+        elif opcion == "2":
+            break
+        else:
             print("opcion invalida")
 
 #funcion que maneja la pantalla en la que el usuario introduce el nivel desde el teclado
