@@ -86,19 +86,35 @@ def PartidaNueva():
         pygame.display.update()
         opcion = Leer(420, 416, color_lectura, 1, 444, 430)
 
+#Funcion que maneja la confirmacion de salida
+def ConfirmacionSalida():
+    #Precondicion: True
+    #Postcondicion: True
+    ventana.fill(color_cielo)
+    dibujarMenu("salida",["si","no"],"horizontal",100,30,112,279,138,464)
+    while True:
+        pygame.display.update()
+        opcion = Leer(408, 480, color_lectura, 1, 432, 494)
+        if opcion == "1":
+            cerrar()
+        elif opcion == "2":
+            break
+        else:
+            print("opcion invalida")
+
 #funcion que maneja el menu principal
 def MenuPrincipal():
     #precondicion true
     #mostrar opciones al usuario
-    ventana.fill(color_cielo)
-    ventana.blit(imagenTitulo, (150,20))
-    pygame.display.update()
-    dibujarMenu("menuprincipal", ["partidanueva", "cargarpartida", "mostrarrecords", "salirjuego"], "vertical",
-                100,180,200,300,150,540)
-    pygame.display.update()
-    x = 10
-    y = 10
     while True:
+        ventana.fill(color_cielo)
+        ventana.blit(imagenTitulo, (150, 20))
+        pygame.display.update()
+        dibujarMenu("menuprincipal", ["partidanueva", "cargarpartida", "mostrarrecords", "salirjuego"], "vertical",
+                    100, 180, 200, 300, 150, 540)
+        pygame.display.update()
+        x = 10
+        y = 10
         opcion = Leer(420,556, color_lectura,1,444,570)
         if opcion == "1":
             PartidaNueva()
@@ -107,8 +123,7 @@ def MenuPrincipal():
         elif opcion == "3":
             print("Records")
         elif opcion == "4":
-            print("seguro??")
-            cerrar()
+            ConfirmacionSalida()
         else:
             print("Error opcion invalida")
 
