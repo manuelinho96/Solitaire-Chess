@@ -126,11 +126,16 @@ def ConfirmacionSalida():
             print("opcion invalida")
 
 def IntroducirNivel():
+    #Precondicion: True
+    #Postcondicion:
+    imagenNivel = pygame.transform.scale(pygame.image.load("sources/sprites/configurartablero.png"), (400,200))
     while True:
         ventana.blit(imagenFondo, (0, 0))
         ventana.blit(imagenTitulo, (150, 20))
+        ventana.blit(imagenTexto, (10,346))
+        ventana.blit(imagenNivel, (100,100))
         pygame.display.update()
-        nivel = Leer(20, 356, color_lectura, 50, 580,378)
+        nivel = Leer(20, 356, color_lectura, 44, 580,378)
 
 
 #funcion que maneja el menu principal
@@ -165,5 +170,6 @@ pygame.display.set_caption("Solitaire Chess")
 imagenTablero = pygame.image.load("sources/sprites/tablero.jpg")
 imagenTitulo = pygame.transform.scale(pygame.image.load("sources/sprites/title.png"), (300,150))
 imagenFondo = pygame.image.load("sources/sprites/fondo.jpg")
+imagenTexto = pygame.image.load("sources/sprites/cuadrodetexto.png")
 fuente = pygame.font.Font(None, 28)
 MenuPrincipal()
