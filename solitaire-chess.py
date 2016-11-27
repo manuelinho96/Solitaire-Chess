@@ -116,14 +116,15 @@ def PartidaNueva():
         dibujarMenu("seleccionarnivel", ["facil", "dificil", "muydificil", "entrenamiento", "volver"], "vertical",
                     100, 30, 200, 150, 150, 450)
         pygame.display.update()
-        opcion = Leer(415, 465, color_lectura, 1, 440, 486)
-        #opcion = "1"
+        #opcion = Leer(415, 465, color_lectura, 1, 440, 486)
+        opcion = "1"
         if opcion == "5":
             break
         elif opcion == "1" or opcion == "2" or opcion == "4":
             nivel = IntroducirNivel()
             if validarString(nivel):
                 tablero = MatrizDeString(nivel)
+                DibujarTablero(tablero)
                 cerrar()
     #postcondicion true
 
@@ -172,6 +173,34 @@ def ConfirmacionSalida():
         else:
             print("opcion invalida")
 
+def DibujarFicha(ficha, x, y):
+    if ficha == "R":
+        ventana.blit(imagenRey, (x,y))
+    elif ficha == "D":
+        ventana.blit(imagenReina, (x,y))
+    elif ficha == "A":
+        ventana.blit(imagenAlfil, (x,y))
+    elif ficha == "C":
+        ventana.blit(imagenCaballo, (x,y))
+    elif ficha == "T":
+        ventana.blit(imagenTorre, (x,y))
+    elif ficha == "P":
+        ventana.blit(imagenPeon, (x,y))
+
+
+def DibujarTablero(tablero):
+    while True:
+        filas = len(tablero)
+        columnas = len(tablero[0])
+        ventana.blit(imagenFondo, (0,0))
+        ventana.blit(imagenTablero, (100,100))
+        for fila in range(filas):
+            for columna in range(columnas):
+                # se trabaja con la posicion columnas - columna para que se dubijen de arriba a abajo
+                pos_columna = columnas - columna - 1
+                DibujarFicha(tablero[fila][pos_columna], 114 + (fila * 76), 190 - (pos_columna * 50))
+        Leer(400,400,(0,0,0), 2, 420,420)
+
 #funcion que maneja la pantalla en la que el usuario introduce el nivel desde el teclado
 def IntroducirNivel():
     #Precondicion: True
@@ -182,8 +211,8 @@ def IntroducirNivel():
         ventana.blit(imagenTexto, (10,346))
         ventana.blit(imagenNivel, (100,100))
         pygame.display.update()
-        nivel = Leer(20, 356, color_lectura, 44, 580,378)
-        #nivel = "Cc4-a2-Rd3"
+        #nivel = Leer(20, 356, color_lectura, 44, 580,378)
+        nivel = "Cc4-a2-Ac3-Rd3-Tb4-Da3"
         #postcondicion nivel no es vacio
         try:
             assert(len(nivel) > 0)
@@ -229,7 +258,8 @@ def MenuPrincipal():
         dibujarMenu("menuprincipal", ["partidanueva", "cargarpartida", "mostrarrecords", "salirjuego"], "vertical",
                     100, 180, 200, 300, 150, 540)
         pygame.display.update()
-        opcion = Leer(415,555, color_lectura,1,440,575)
+        #opcion = Leer(415,555, color_lectura,1,440,575)
+        opcion = "1"
         if opcion == "1":
             PartidaNueva()
         elif opcion == "2":
@@ -242,14 +272,23 @@ def MenuPrincipal():
             print("Error opcion invalida")
         # post condicion true
 
+def FormatearFicha(imagen):
+    return pygame.transform.scale(imagen, (50,90))
+
 pygame.init()
 color_cielo = pygame.Color(25,158,218)
 color_lectura = pygame.Color(147, 55, 120)
 ventana = pygame.display.set_mode((600,600))
 pygame.display.set_caption("Solitaire Chess")
-imagenTablero = pygame.image.load("sources/sprites/tablero.jpg")
 imagenTitulo = pygame.transform.scale(pygame.image.load("sources/sprites/title.png"), (300,150))
 imagenFondo = pygame.image.load("sources/sprites/fondo.jpg")
 imagenTexto = pygame.image.load("sources/sprites/cuadrodetexto.png")
+imagenTablero = pygame.image.load("sources/sprites/tablero.jpg")
+imagenRey = FormatearFicha(pygame.image.load("sources/sprites/rey.png"))
+imagenAlfil = FormatearFicha(pygame.image.load("sources/sprites/alfil.png"))
+imagenReina = FormatearFicha(pygame.image.load("sources/sprites/reina.png"))
+imagenCaballo = FormatearFicha(pygame.image.load("sources/sprites/caballo.png"))
+imagenTorre = FormatearFicha(pygame.image.load("sources/sprites/torre.png"))
+imagenPeon = FormatearFicha(pygame.image.load("sources/sprites/peon.png"))
 fuente = pygame.font.Font(None, 28)
 MenuPrincipal()
