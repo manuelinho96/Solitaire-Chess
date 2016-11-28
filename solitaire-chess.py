@@ -11,6 +11,7 @@ def cerrar():
     sys.exit()
     # postcondicion true
 
+
 #funcion que detecta eventos y evalua si son teclas
 #y retorna la entrada del usuario
 def Leer(x,y, color, longitud_maxima, xfinal, yfinal):
@@ -67,6 +68,7 @@ def Leer(x,y, color, longitud_maxima, xfinal, yfinal):
                     bloq_mayus = False
     #postcondicion true
 
+
 #funcion que recibe un string del mensaje de la opcion
 #y carga el sprite correspondiente y lo lleva a resolucion
 #150x50
@@ -77,7 +79,6 @@ def formatearOpcion(opcion):
         return pygame.transform.scale(pygame.image.load("sources/sprites/" + opcion + ".png"), (200,50))
     except:
         return "no se encontro la imagen"
-
 
 
 #funcion que dibuja un menu y sus opciones
@@ -108,6 +109,88 @@ def dibujarMenu(titulo, opciones, orientacion,xtitulo,ytitulo,xopcion,yopcion,xi
     #postcondicion true
 
 
+""" funcion que busca fichas en la direccion vertical, tanto en la casilla objetivo como en las anteriores
+(las fichas que se mueven verticalmente no pueden saltar otras fichas
+retorna true si la ficha se puede mover hasta su objetivo y matar
+retorna falso si no hay una ficha en la casilla objetivo y si hay fichas atravesadas en su camino
+def BusquedaVertical(x, y_inicial, y_final, direccion, tablero):
+     precondicion: y_inicial menor y_final(si la direccion es a la derecha).
+     y_inicial mayor y_final(si la direccion es a la izquierda). y_inicial, y_final, y deben estar entre 0 y 3,
+
+    assert(((y_inicial < y_final and direccion == "derecha") or (y_inicial > y_final and direccion == "izquierda")) and
+           y_inicial >= 0 and y_inicial <= 3 and y_final >= 0 and y_final <= 3 and y >= 0 and y <= 3)
+    resultado = True #inicializando valores
+    if tablero[x][y_final] == "" and resultado:
+        resultado = False
+    if resultado and direccion == "derecha":
+        for x in range(y_inicial + 1, y_final):
+            if tablero[x][y] != "":
+                resultado = False
+    if resultado and direccion == "izquierda":
+        for x in range(y_final + 1, y_inicial):
+            if tablero[x][y] != "" and x > y_final:
+                resultado = False
+    # postcondicion
+                #resultado debe ser true sino hay fichas de por medio y la casilla objetivo si tiene una ficha
+                #resultado debe ser false si existe una ficha de por medio o si la casilla objetivo no tiene ficha
+    assert((resultado and tablero[x][y_final] != "" and ((direccion == "izquierda" and
+        all(tablero[x][y] == "" for x in range(y_final + 1, y_inicial))) or
+            (direccion == "derecha" and all(tablero[x][y] == "" for x in range(y_inicial + 1, y_final))))) or
+           (not resultado and (tablero[x][y_final] == "" or (direccion == "izquierda" and
+        any(tablero[x][y] != "" for x in range(y_final + 1, y_inicial))) or (direccion == "derecha" and
+        any(tablero[x][y] != "" for x in range(y_inicial + 1, y_final))))))
+    return resultado
+"""
+
+""" funcion que busca fichas en la direccion horizontal, tanto en la casilla objetivo como en las anteriores
+(las fichas que se mueven horizontalmente no pueden saltar otras fichas
+retorna true si la ficha se puede mover hasta su objetivo y matar
+retorna falso si no hay una ficha en la casilla objetivo y si hay fichas atravesadas en su camino """
+def BusquedaHorizontal(x_inicial, x_final, y, direccion, tablero):
+    """ precondicion: x_inicial menor x_final(si la direccion es a la derecha).
+     x_inicial mayor x_final(si la direccion es a la izquierda). x_inicial, x_final, y deben estar entre 0 y 3,
+    """
+    assert(((x_inicial < x_final and direccion == "derecha") or (x_inicial > x_final and direccion == "izquierda")) and
+           x_inicial >= 0 and x_inicial <= 3 and x_final >= 0 and x_final <= 3 and y >= 0 and y <= 3)
+    resultado = True #inicializando valores
+    if tablero[x_final][y] == "" and resultado:
+        resultado = False
+    if resultado and direccion == "derecha":
+        for x in range(x_inicial + 1, x_final):
+            if tablero[x][y] != "":
+                resultado = False
+    if resultado and direccion == "izquierda":
+        for x in range(x_final + 1, x_inicial):
+            if tablero[x][y] != "" and x > x_final:
+                resultado = False
+    # postcondicion
+                #resultado debe ser true sino hay fichas de por medio y la casilla objetivo si tiene una ficha
+                #resultado debe ser false si existe una ficha de por medio o si la casilla objetivo no tiene ficha
+    assert((resultado and tablero[x_final][y] != "" and ((direccion == "izquierda" and
+        all(tablero[x][y] == "" for x in range(x_final + 1, x_inicial))) or
+            (direccion == "derecha" and all(tablero[x][y] == "" for x in range(x_inicial + 1, x_final))))) or
+           (not resultado and (tablero[x_final][y] == "" or (direccion == "izquierda" and
+        any(tablero[x][y] != "" for x in range(x_final + 1, x_inicial))) or (direccion == "derecha" and
+        any(tablero[x][y] != "" for x in range(x_inicial + 1, x_final))))))
+    return resultado
+
+# funcion que controla cuando una ficha come a otra
+def ComerFicha(tablero, ficha_asesina, x_origen, y_origen, x_objetivo, y_objetivo):
+    #precondicion: el tablero en la casilla objetivo no puede estar vacio
+    print(tablero[x_objetivo][y_objetivo])
+    try:
+        assert(tablero[x_objetivo][y_objetivo] != "")
+    except:
+        print("la casilla objetivo esta vacia")
+        return tablero
+    #tablero[x_objetivo][y_objetivo] = ficha_asesina
+    # postcondicion: la casilla objetivo es reescrita con la ficha asesina
+    #assert(tablero[x_objetivo][y_objetivo] == ficha_asesina)
+    print(BusquedaHorizontal(x_origen, x_objetivo, y_origen, "derecha", tablero))
+    MoverFicha(x_origen, y_origen, x_objetivo, y_objetivo, tablero, ficha_asesina)
+    return tablero
+
+
 #Funcion que maneja el menu de partida nueva
 def PartidaNueva():
     #Precondicion: True
@@ -125,8 +208,11 @@ def PartidaNueva():
             if validarString(nivel):
                 tablero = MatrizDeString(nivel)
                 DibujarTablero(tablero)
+                tablero = ComerFicha(tablero, "D", 0, 2, 1, 2)
+                Leer(500, 500, (0,0,0), 2, 501, 501)
                 cerrar()
     #postcondicion true
+
 
 #funcion que determina si un string es un nivel de valido o no
 def validarString(string) -> bool:
@@ -173,6 +259,7 @@ def ConfirmacionSalida():
         else:
             print("opcion invalida")
 
+
 def DibujarFicha(ficha, x, y):
     if ficha == "R":
         ventana.blit(imagenRey, (x,y))
@@ -189,21 +276,47 @@ def DibujarFicha(ficha, x, y):
 
 
 def DibujarTablero(tablero):
-    while True:
-        filas = len(tablero)
-        columnas = len(tablero[0])
-        ventana.blit(imagenFondo, (0,0))
-        ventana.blit(imagenTablero, (100,100))
-        for fila in range(filas):
-            for columna in range(columnas):
-                # se trabaja con la posicion columnas - columna para que se dubijen de arriba a abajo
-                pos_columna = columnas - columna - 1
-                DibujarFicha(tablero[fila][pos_columna], 114 + (fila * 76), 190 - (pos_columna * 50))
-        Leer(400,400,(0,0,0), 2, 420,420)
+    filas = len(tablero)
+    columnas = len(tablero[0])
+    ventana.blit(imagenFondo, (0,0))
+    ventana.blit(imagenTablero, (x_fichas - 14, y_fichas - 90))
+    for fila in range(filas):
+        for columna in range(columnas):
+            # se trabaja con la posicion columnas - columna para que se dubijen de arriba a abajo
+            pos_columna = columnas - 1 - columna
+            DibujarFicha(tablero[fila][pos_columna], x_fichas + (fila * cambio_x), y_fichas - (pos_columna * cambio_y))
 
-#funcion que maneja la pantalla en la que el usuario introduce el nivel desde el teclado
+
+# funcion que controla la animacion de mover una ficha de una casilla a otra, controlado en pixeles
+def MoverFicha(fila, columna, filafinal, columnafinal, tablero, ficha):
+    tiempo_inicio = pygame.time.get_ticks()
+    tablero[fila][columna] = ""
+    # precondicion x,y,xf,yf deben estar entre 0 y 600
+    x = x_fichas + (fila * cambio_x)
+    y = y_fichas - (columna * cambio_y)
+    xf = x_fichas + (filafinal * cambio_x)
+    yf = y_fichas - (columnafinal * cambio_y)
+    assert(x >= 0 and x <= 600 and xf >= 0 and xf <= 600 and y >= 0 and y <= 600 and yf >= 0 and yf <= 600)
+    i = 0
+    while i <= 1:
+        # cota i - 1 <= 0
+        try:
+            assert(i - 1 <= 0)
+        except:
+            print("El ciclo de la animacion se excedio de iteraciones")
+        i += 0.005
+        # parametrizacion de la recta entre el pixel inicial y el pixel final
+        x_actual = (xf-x) * i + x
+        y_actual = (yf - y) * i + y
+        DibujarTablero(tablero)
+        DibujarFicha(ficha, x_actual, y_actual)
+        pygame.display.update()
+    # postcondicion True
+
+
+# funcion que maneja la pantalla en la que el usuario introduce el nivel desde el teclado
 def IntroducirNivel():
-    #Precondicion: True
+    # Precondicion: True
     imagenNivel = pygame.transform.scale(pygame.image.load("sources/sprites/configurartablero.png"), (400,200))
     while True:
         ventana.blit(imagenFondo, (0, 0))
@@ -291,4 +404,8 @@ imagenCaballo = FormatearFicha(pygame.image.load("sources/sprites/caballo.png"))
 imagenTorre = FormatearFicha(pygame.image.load("sources/sprites/torre.png"))
 imagenPeon = FormatearFicha(pygame.image.load("sources/sprites/peon.png"))
 fuente = pygame.font.Font(None, 28)
+x_fichas = 114
+cambio_x = 76
+y_fichas = 190
+cambio_y = 50
 MenuPrincipal()
