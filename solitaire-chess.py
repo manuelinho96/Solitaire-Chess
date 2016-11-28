@@ -108,6 +108,57 @@ def dibujarMenu(titulo, opciones, orientacion,xtitulo,ytitulo,xopcion,yopcion,xi
     ventana.blit(introduzca_opcion, (xintro,yintro))
     #postcondicion true
 
+"""
+Funcion que busca fichas en la direccion diagonal principal.
+"""
+def BusquedaDiagonalSimetrica(x_inicial, x_final, y_inicial, direccion, tablero):
+    #Precondicion:
+    #Postcondicion:
+    distancia = abs(x_final-x_inicial)
+    resultado = True
+    print(x_final,distancia,y_inicial+distancia)
+    if direccion == "positiva":
+        if tablero[x_final][y_inicial + distancia] == "" and resultado:
+            resultado = False
+        else:
+            for i in range(1,distancia):
+                if tablero[x_inicial+i][y_inicial+i] != "":
+                    resultado = False
+    if direccion == "negativa":
+        if tablero[x_final][y_inicial - distancia] == "" and resultado:
+            resultado = False
+        else:
+            for i in range(1,distancia):
+                if tablero[x_inicial-i][y_inicial-i] != "":
+                    resultado = False
+    return resultado
+
+
+"""
+Funcion que busca fichas en la direccion diagonal secundaria.
+"""
+def BusquedaDiagonalAsimetrica(x_inicial, x_final, y_inicial, direccion, tablero):
+    #Precondicion:
+    #Postcondicion:
+    distancia = abs(x_final-x_inicial)
+    resultado = True
+    print(x_final,distancia,y_inicial+distancia)
+    if direccion == "positiva":
+        if tablero[x_final][y_inicial - distancia] == "" and resultado:
+            resultado = False
+        else:
+            for i in range(1,distancia):
+                if tablero[x_inicial+i][y_inicial-i] != "":
+                    resultado = False
+    if direccion == "negativa":
+        if tablero[x_final][y_inicial + distancia] == "" and resultado:
+            resultado = False
+        else:
+            for i in range(1,distancia):
+                if tablero[x_inicial-i][y_inicial+i] != "":
+                    resultado = False
+    return resultado
+
 
 def TrasponerMatriz(matriz):
     #precondicion true
@@ -125,7 +176,7 @@ def TrasponerMatriz(matriz):
 funcion que busca fichas en la direccion vertical, tanto en la casilla objetivo como en las anteriores
 (las fichas que se mueven vertical no pueden saltar otras fichas
 retorna true si la ficha se puede mover hasta su objetivo y matar
-retorna falso si no hay una ficha en la casilla objetivo y si hay fichas atravesadas en su camino
+retorna falso si no hay una ficha en la casilla objetivo y si hay fichas atravesadas en su camino.
 """
 def BusquedaVertical(x, y_inicial, y_final, direccion, tablero):
     assert (((y_inicial < y_final and direccion == "arriba") or (y_inicial > y_final and direccion == "abajo")) and
@@ -178,11 +229,11 @@ def ComerFicha(tablero, ficha_asesina, x_origen, y_origen, x_objetivo, y_objetiv
     except:
         print("la casilla objetivo esta vacia")
         return tablero
-    #tablero[x_objetivo][y_objetivo] = ficha_asesina
-    # postcondicion: la casilla objetivo es reescrita con la ficha asesina
+    #postcondicion: la casilla objetivo es reescrita con la ficha asesina
     #assert(tablero[x_objetivo][y_objetivo] == ficha_asesina)
-    print(BusquedaVertical(x_origen, y_origen, y_objetivo, "abajo", tablero))
-    MoverFicha(x_origen, y_origen, x_objetivo, y_objetivo, tablero, ficha_asesina)
+    if BusquedaDiagonalAsimetrica(x_origen,x_objetivo, y_origen, "positiva", tablero):
+        MoverFicha(x_origen, y_origen, x_objetivo, y_objetivo, tablero, ficha_asesina)
+        tablero[x_objetivo][y_objetivo] = ficha_asesina
     return tablero
 
 
@@ -203,7 +254,8 @@ def PartidaNueva():
             if validarString(nivel):
                 tablero = MatrizDeString(nivel)
                 DibujarTablero(tablero)
-                tablero = ComerFicha(tablero, "D", 0, 2, 0, 0)
+                tablero = ComerFicha(tablero, "D", 1, 3, 3, 1)
+                DibujarTablero(tablero)
                 Leer(500, 500, (0,0,0), 2, 501, 501)
                 cerrar()
     #postcondicion true
@@ -320,7 +372,7 @@ def IntroducirNivel():
         ventana.blit(imagenNivel, (100,100))
         pygame.display.update()
         #nivel = Leer(20, 356, color_lectura, 44, 580,378)
-        nivel = "Cc4-a2-Aa1-Rd3-Tb4-Da3"
+        nivel = "a2-Aa1-Rc3-Db4-Td2"
         #postcondicion nivel no es vacio
         try:
             assert(len(nivel) > 0)
