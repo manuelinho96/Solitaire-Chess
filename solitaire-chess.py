@@ -109,38 +109,33 @@ def dibujarMenu(titulo, opciones, orientacion,xtitulo,ytitulo,xopcion,yopcion,xi
     #postcondicion true
 
 
-""" funcion que busca fichas en la direccion vertical, tanto en la casilla objetivo como en las anteriores
-(las fichas que se mueven verticalmente no pueden saltar otras fichas
+def TrasponerMatriz(matriz):
+    #precondicion true
+    matriz_traspuesta = []
+    for x in range(len(matriz)):
+        matriz_traspuesta.append(['' for y in matriz[0]])
+    for x in range(len(matriz)):
+        for y in range(len(matriz[x])):
+            matriz_traspuesta[y][x] = matriz[x][y]
+    #postcondicion la matriz esta traspuesta
+    assert(all(all(matriz_traspuesta[y][x] == matriz[x][y] for y in range(len(matriz))) for x in range(len(matriz))))
+    return matriz_traspuesta
+
+"""
+funcion que busca fichas en la direccion vertical, tanto en la casilla objetivo como en las anteriores
+(las fichas que se mueven vertical no pueden saltar otras fichas
 retorna true si la ficha se puede mover hasta su objetivo y matar
 retorna falso si no hay una ficha en la casilla objetivo y si hay fichas atravesadas en su camino
-def BusquedaVertical(x, y_inicial, y_final, direccion, tablero):
-     precondicion: y_inicial menor y_final(si la direccion es a la derecha).
-     y_inicial mayor y_final(si la direccion es a la izquierda). y_inicial, y_final, y deben estar entre 0 y 3,
-
-    assert(((y_inicial < y_final and direccion == "derecha") or (y_inicial > y_final and direccion == "izquierda")) and
-           y_inicial >= 0 and y_inicial <= 3 and y_final >= 0 and y_final <= 3 and y >= 0 and y <= 3)
-    resultado = True #inicializando valores
-    if tablero[x][y_final] == "" and resultado:
-        resultado = False
-    if resultado and direccion == "derecha":
-        for x in range(y_inicial + 1, y_final):
-            if tablero[x][y] != "":
-                resultado = False
-    if resultado and direccion == "izquierda":
-        for x in range(y_final + 1, y_inicial):
-            if tablero[x][y] != "" and x > y_final:
-                resultado = False
-    # postcondicion
-                #resultado debe ser true sino hay fichas de por medio y la casilla objetivo si tiene una ficha
-                #resultado debe ser false si existe una ficha de por medio o si la casilla objetivo no tiene ficha
-    assert((resultado and tablero[x][y_final] != "" and ((direccion == "izquierda" and
-        all(tablero[x][y] == "" for x in range(y_final + 1, y_inicial))) or
-            (direccion == "derecha" and all(tablero[x][y] == "" for x in range(y_inicial + 1, y_final))))) or
-           (not resultado and (tablero[x][y_final] == "" or (direccion == "izquierda" and
-        any(tablero[x][y] != "" for x in range(y_final + 1, y_inicial))) or (direccion == "derecha" and
-        any(tablero[x][y] != "" for x in range(y_inicial + 1, y_final))))))
-    return resultado
 """
+def BusquedaVertical(x, y_inicial, y_final, direccion, tablero):
+    assert (((y_inicial < y_final and direccion == "arriba") or (y_inicial > y_final and direccion == "abajo")) and
+            y_inicial >= 0 and y_inicial <= 3 and y_final >= 0 and y_final <= 3 and x >= 0 and x <= 3)
+    tablero = TrasponerMatriz(tablero)
+    if direccion == "arriba":
+        return BusquedaHorizontal(y_inicial, y_final, x, "derecha", tablero)
+    else:
+        return BusquedaHorizontal(y_inicial, y_final, x, "izquierda", tablero)
+
 
 """ funcion que busca fichas en la direccion horizontal, tanto en la casilla objetivo como en las anteriores
 (las fichas que se mueven horizontalmente no pueden saltar otras fichas
@@ -174,10 +169,10 @@ def BusquedaHorizontal(x_inicial, x_final, y, direccion, tablero):
         any(tablero[x][y] != "" for x in range(x_inicial + 1, x_final))))))
     return resultado
 
+
 # funcion que controla cuando una ficha come a otra
 def ComerFicha(tablero, ficha_asesina, x_origen, y_origen, x_objetivo, y_objetivo):
     #precondicion: el tablero en la casilla objetivo no puede estar vacio
-    print(tablero[x_objetivo][y_objetivo])
     try:
         assert(tablero[x_objetivo][y_objetivo] != "")
     except:
@@ -186,7 +181,7 @@ def ComerFicha(tablero, ficha_asesina, x_origen, y_origen, x_objetivo, y_objetiv
     #tablero[x_objetivo][y_objetivo] = ficha_asesina
     # postcondicion: la casilla objetivo es reescrita con la ficha asesina
     #assert(tablero[x_objetivo][y_objetivo] == ficha_asesina)
-    print(BusquedaHorizontal(x_origen, x_objetivo, y_origen, "derecha", tablero))
+    print(BusquedaVertical(x_origen, y_origen, y_objetivo, "abajo", tablero))
     MoverFicha(x_origen, y_origen, x_objetivo, y_objetivo, tablero, ficha_asesina)
     return tablero
 
@@ -208,7 +203,7 @@ def PartidaNueva():
             if validarString(nivel):
                 tablero = MatrizDeString(nivel)
                 DibujarTablero(tablero)
-                tablero = ComerFicha(tablero, "D", 0, 2, 1, 2)
+                tablero = ComerFicha(tablero, "D", 0, 2, 0, 0)
                 Leer(500, 500, (0,0,0), 2, 501, 501)
                 cerrar()
     #postcondicion true
@@ -325,7 +320,7 @@ def IntroducirNivel():
         ventana.blit(imagenNivel, (100,100))
         pygame.display.update()
         #nivel = Leer(20, 356, color_lectura, 44, 580,378)
-        nivel = "Cc4-a2-Ac3-Rd3-Tb4-Da3"
+        nivel = "Cc4-a2-Aa1-Rd3-Tb4-Da3"
         #postcondicion nivel no es vacio
         try:
             assert(len(nivel) > 0)
