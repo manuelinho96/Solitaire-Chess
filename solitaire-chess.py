@@ -116,21 +116,22 @@ def BusquedaDiagonalSimetrica(x_inicial, x_final, y_inicial, direccion, tablero)
     #Postcondicion:
     distancia = abs(x_final-x_inicial)
     resultado = True
-    print(x_final,distancia,y_inicial+distancia)
-    if direccion == "positiva":
+    if direccion == "positiva" and distancia+y_inicial <= 3:
         if tablero[x_final][y_inicial + distancia] == "" and resultado:
             resultado = False
         else:
             for i in range(1,distancia):
                 if tablero[x_inicial+i][y_inicial+i] != "":
                     resultado = False
-    if direccion == "negativa":
+    elif direccion == "negativa" and y_inicial-distancia >= 0:
         if tablero[x_final][y_inicial - distancia] == "" and resultado:
             resultado = False
         else:
             for i in range(1,distancia):
                 if tablero[x_inicial-i][y_inicial-i] != "":
                     resultado = False
+    else:
+        resultado = False
     return resultado
 
 
@@ -142,21 +143,22 @@ def BusquedaDiagonalAsimetrica(x_inicial, x_final, y_inicial, direccion, tablero
     #Postcondicion:
     distancia = abs(x_final-x_inicial)
     resultado = True
-    print(x_final,distancia,y_inicial+distancia)
-    if direccion == "positiva":
+    if direccion == "positiva" and y_inicial - distancia >= 0:
         if tablero[x_final][y_inicial - distancia] == "" and resultado:
             resultado = False
         else:
             for i in range(1,distancia):
                 if tablero[x_inicial+i][y_inicial-i] != "":
                     resultado = False
-    if direccion == "negativa":
+    elif direccion == "negativa" and y_inicial + distancia <= 3:
         if tablero[x_final][y_inicial + distancia] == "" and resultado:
             resultado = False
         else:
             for i in range(1,distancia):
                 if tablero[x_inicial-i][y_inicial+i] != "":
                     resultado = False
+    else:
+        resultado = False
     return resultado
 
 
@@ -231,9 +233,8 @@ def ComerFicha(tablero, ficha_asesina, x_origen, y_origen, x_objetivo, y_objetiv
         return tablero
     #postcondicion: la casilla objetivo es reescrita con la ficha asesina
     #assert(tablero[x_objetivo][y_objetivo] == ficha_asesina)
-    if BusquedaDiagonalAsimetrica(x_origen,x_objetivo, y_origen, "positiva", tablero):
-        MoverFicha(x_origen, y_origen, x_objetivo, y_objetivo, tablero, ficha_asesina)
-        tablero[x_objetivo][y_objetivo] = ficha_asesina
+    MoverFicha(x_origen, y_origen, x_objetivo, y_objetivo, tablero, ficha_asesina)
+    tablero[x_objetivo][y_objetivo] = ficha_asesina
     return tablero
 
 
@@ -254,7 +255,12 @@ def PartidaNueva():
             if validarString(nivel):
                 tablero = MatrizDeString(nivel)
                 DibujarTablero(tablero)
-                tablero = ComerFicha(tablero, "D", 1, 3, 3, 1)
+                x = 0
+                y = 3
+                xobjetivo = 1
+                yobjetivo = 3
+                if (xobjetivo,yobjetivo) in PosicionesValidasRey(x, y, tablero):
+                    tablero = ComerFicha(tablero, "R", x, y, xobjetivo, yobjetivo)
                 DibujarTablero(tablero)
                 Leer(500, 500, (0,0,0), 2, 501, 501)
                 cerrar()
@@ -361,6 +367,82 @@ def MoverFicha(fila, columna, filafinal, columnafinal, tablero, ficha):
     # postcondicion True
 
 
+def PosicionesValidasTorre(xorigen, yorigen, tablero):
+    #Precondicion: True
+    posiciones_validas = []
+    for x in range(xorigen+1,4):
+        if BusquedaHorizontal(xorigen, x, yorigen, "derecha", tablero):
+            posiciones_validas.append((x, yorigen))
+            break
+    for x in range(xorigen):
+        if BusquedaHorizontal(xorigen, x, yorigen, "izquierda", tablero):
+            posiciones_validas.append((x, yorigen))
+            break
+    for y in range(yorigen):
+        if BusquedaVertical(xorigen, yorigen, y, "abajo", tablero):
+            posiciones_validas.append((xorigen,y))
+            break
+    for y in range(yorigen+1,4):
+        if BusquedaVertical(xorigen, yorigen, y, "arriba", tablero):
+            posiciones_validas.append((xorigen,y))
+            break
+    return posiciones_validas
+    #Postcondicion: True
+
+
+
+def PosicionesValidasAlfil(xorigen, yorigen, tablero, espeon):
+    #Precondicion: True
+    posiciones_validas = []
+    if espeon:
+        distanciamaxima = xorigen+2
+        distanciamaxima2 = xorigen-2
+    else:
+        distanciamaxima = 4
+        distanciamaxima2 = 0
+    if  not espeon:
+        for x in range(xorigen):
+            if BusquedaDiagonalSimetrica(xorigen, x, yorigen, "negativa", tablero):
+                posiciones_validas.append((x, yorigen - x + xorigen))
+                break
+        for x in range(xorigen + 1, 4):
+            if BusquedaDiagonalAsimetrica(xorigen, x, yorigen, "positiva", tablero):
+                posiciones_validas.append((x, yorigen - (x - xorigen)))
+                break
+    for x in range(xorigen+1,distanciamaxima):
+        if BusquedaDiagonalSimetrica(xorigen, x, yorigen, "positiva", tablero):
+            posiciones_validas.append((x, yorigen+x-xorigen))
+            break
+    for x in range(distanciamaxima2,xorigen):
+        if BusquedaDiagonalAsimetrica(xorigen, x, yorigen, "negativa", tablero):
+            posiciones_validas.append((x, yorigen+xorigen-x))
+            break
+    return posiciones_validas
+    #Postcondicion: True
+
+
+def PosicionesValidasRey(xorigen,yorigen,tablero):
+    #Precondicion:
+    posiciones_validas = []
+    if yorigen != 0:
+        yinicio = yorigen-1
+    else:
+        yinicio = yorigen
+    if yorigen != 3:
+        yfin = yorigen+2
+    else:
+        yfin = yorigen+1
+    for y in range(yinicio,yfin):
+        if xorigen != 0 and tablero[xorigen - 1][y] != "":
+            posiciones_validas.append((xorigen - 1, y))
+        if xorigen != 3 and tablero[xorigen+1][y] != "":
+            posiciones_validas.append((xorigen + 1, y))
+        if y != yorigen and tablero[0][y] != "":
+            posiciones_validas.append((0,y))
+    return posiciones_validas
+    #Postcondicion
+
+
 # funcion que maneja la pantalla en la que el usuario introduce el nivel desde el teclado
 def IntroducirNivel():
     # Precondicion: True
@@ -372,7 +454,7 @@ def IntroducirNivel():
         ventana.blit(imagenNivel, (100,100))
         pygame.display.update()
         #nivel = Leer(20, 356, color_lectura, 44, 580,378)
-        nivel = "a2-Aa1-Rc3-Db4-Td2"
+        nivel = "Ra4-a1-b1-c1-a2-a3-c3-b3-c2"
         #postcondicion nivel no es vacio
         try:
             assert(len(nivel) > 0)
