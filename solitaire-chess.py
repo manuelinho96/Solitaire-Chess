@@ -41,12 +41,12 @@ def Leer(x,y, color, longitud_maxima, xfinal, yfinal):
                     shift = True
                 elif event.key == 301: #presionar bloq mayus
                     bloq_mayus = True
-                if ((patron.match(pygame.key.name(event.key)) != None or event.key == 47) and
+                if ((patron.match(pygame.key.name(event.key)) != None or event.key == 45) and
                                 len(string) < longitud_maxima):
                     # dibujar la letra, sumarle pixeles dependiendo de la longitud para que quede mas lejos la letra nueva
                     # recordar que se debe usar el color pasado por parametro
                     letra = pygame.key.name(event.key)
-                    if event.key == 47:
+                    if event.key == 45:
                         letra = "-"
                     if shift != bloq_mayus:
                         letra = letra.upper()
@@ -255,12 +255,12 @@ def PartidaNueva():
             if validarString(nivel):
                 tablero = MatrizDeString(nivel)
                 DibujarTablero(tablero)
-                x = 0
-                y = 1
-                xobjetivo = 0
-                yobjetivo = 0
-                if (xobjetivo,yobjetivo) in (PosicionesValidasTorre(x, y, tablero) + PosicionesValidasAlfil(x, y, tablero, False)):
-                    tablero = ComerFicha(tablero, "D", x, y, xobjetivo, yobjetivo) #Ra1-Da2-b1
+                x = 3
+                y = 0
+                xobjetivo = 2
+                yobjetivo = 2
+                if (xobjetivo,yobjetivo) in PosicionesValidasCaballo(x, y, tablero):
+                    tablero = ComerFicha(tablero, "C", x, y, xobjetivo, yobjetivo)
                 DibujarTablero(tablero)
                 Leer(500, 500, (0,0,0), 2, 501, 501)
                 cerrar()
@@ -367,6 +367,31 @@ def MoverFicha(fila, columna, filafinal, columnafinal, tablero, ficha):
     # postcondicion True
 
 
+def PosicionesValidasCaballo(xorigen, yorigen, tablero):
+    posiciones_validas = []
+    if xorigen >= 2 :
+        if yorigen > 0 and tablero[xorigen - 2][yorigen - 1] != "":
+            posiciones_validas.append((xorigen - 2, yorigen - 1))
+        if yorigen < 3 and tablero[xorigen - 2][yorigen + 1] != "":
+                posiciones_validas.append((xorigen - 2, yorigen + 1))
+    if xorigen <= 1 :
+        if yorigen > 0 and tablero[xorigen + 2][yorigen - 1] != "":
+            posiciones_validas.append((xorigen + 2, yorigen - 1))
+        if yorigen < 3 and tablero[xorigen + 2][yorigen + 1] != "":
+            posiciones_validas.append((xorigen + 2, yorigen + 1))
+    if yorigen >= 2 :
+        if xorigen > 0 and tablero[xorigen - 1][yorigen - 2] != "":
+            posiciones_validas.append((xorigen - 1, yorigen - 2))
+        if xorigen < 3 and tablero[xorigen + 1][yorigen - 2] != "":
+                posiciones_validas.append((xorigen + 1, yorigen - 2))
+    if yorigen <= 1 :
+        if xorigen > 0 and tablero[xorigen - 1][yorigen + 2] != "":
+            posiciones_validas.append((xorigen - 1, yorigen + 2))
+        if xorigen < 3 and tablero[xorigen + 1][yorigen + 2] != "":
+            posiciones_validas.append((xorigen + 1, yorigen + 2))
+    return posiciones_validas
+
+
 def PosicionesValidasTorre(xorigen, yorigen, tablero):
     #Precondicion: True
     posiciones_validas = []
@@ -454,7 +479,7 @@ def IntroducirNivel():
         ventana.blit(imagenNivel, (100,100))
         pygame.display.update()
         #nivel = Leer(20, 356, color_lectura, 44, 580,378)
-        nivel = "Ra1-Da2-b1"
+        nivel = "Cd1-b1-c3-c2"
         #postcondicion nivel no es vacio
         try:
             assert(len(nivel) > 0)
