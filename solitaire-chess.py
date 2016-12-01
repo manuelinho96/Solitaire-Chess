@@ -256,11 +256,11 @@ def PartidaNueva():
                 tablero = MatrizDeString(nivel)
                 DibujarTablero(tablero)
                 x = 0
-                y = 3
-                xobjetivo = 1
-                yobjetivo = 3
-                if (xobjetivo,yobjetivo) in PosicionesValidasRey(x, y, tablero):
-                    tablero = ComerFicha(tablero, "R", x, y, xobjetivo, yobjetivo)
+                y = 1
+                xobjetivo = 0
+                yobjetivo = 0
+                if (xobjetivo,yobjetivo) in (PosicionesValidasTorre(x, y, tablero) + PosicionesValidasAlfil(x, y, tablero, False)):
+                    tablero = ComerFicha(tablero, "D", x, y, xobjetivo, yobjetivo) #Ra1-Da2-b1
                 DibujarTablero(tablero)
                 Leer(500, 500, (0,0,0), 2, 501, 501)
                 cerrar()
@@ -454,7 +454,7 @@ def IntroducirNivel():
         ventana.blit(imagenNivel, (100,100))
         pygame.display.update()
         #nivel = Leer(20, 356, color_lectura, 44, 580,378)
-        nivel = "Ra4-a1-b1-c1-a2-a3-c3-b3-c2"
+        nivel = "Ra1-Da2-b1"
         #postcondicion nivel no es vacio
         try:
             assert(len(nivel) > 0)
