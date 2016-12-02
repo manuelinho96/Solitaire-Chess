@@ -1,4 +1,4 @@
-import pygame, sys, re
+import pygame, sys, re, time
 from pygame.locals import *
 
 shift = False #variable booleana que indica el estado de la tecla shift
@@ -41,13 +41,11 @@ def Leer(x,y, color, longitud_maxima, xfinal, yfinal):
                     shift = True
                 elif event.key == 301: #presionar bloq mayus
                     bloq_mayus = True
-                if ((patron.match(pygame.key.name(event.key)) != None or event.key == 45) and
+                if ((patron.match(pygame.key.name(event.key)) != None or pygame.key.name(event.key) == "-") and
                                 len(string) < longitud_maxima):
                     # dibujar la letra, sumarle pixeles dependiendo de la longitud para que quede mas lejos la letra nueva
                     # recordar que se debe usar el color pasado por parametro
                     letra = pygame.key.name(event.key)
-                    if event.key == 45:
-                        letra = "-"
                     if shift != bloq_mayus:
                         letra = letra.upper()
                     string += letra
@@ -58,7 +56,6 @@ def Leer(x,y, color, longitud_maxima, xfinal, yfinal):
                         return string
                     except:
                         print("Error en la lectura")
-                        cerrar()
                 elif event.key == 8 and len(string) > 0: #presionar backspace
                     string = string[:len(string)-1]
             elif event.type == KEYUP:
@@ -72,17 +69,18 @@ def Leer(x,y, color, longitud_maxima, xfinal, yfinal):
 #funcion que recibe un string del mensaje de la opcion
 #y carga el sprite correspondiente y lo lleva a resolucion
 #150x50
-def formatearOpcion(opcion):
+def formatearOpcion(opcion, x):
     #precondicion existe la imagen
     #postcondicion true
     try:
-        return pygame.transform.scale(pygame.image.load("sources/sprites/" + opcion + ".png"), (200,50))
+        return pygame.transform.scale(pygame.image.load("sources/sprites/" + opcion + ".png"), (x,50))
     except:
+        print(opcion)
         return "no se encontro la imagen"
 
 
 #funcion que dibuja un menu y sus opciones
-def dibujarMenu(titulo, opciones, orientacion,xtitulo,ytitulo,xopcion,yopcion,xintro,yintro):
+def dibujarMenu(titulo, opciones, orientacion,xtitulo,ytitulo,xopcion,yopcion,xintro,yintro, longitud_opciones):
     #precondicion al menos debe haber 1 opcion y el titulo debe no ser nulo
     #todas las opciones no deben ser nulas, la orientacion es vertical o horizontal
     #xtitulo, ytitulo, xopcion, yopcion, xintro, yintro deben estar en 0 y 600
@@ -98,12 +96,12 @@ def dibujarMenu(titulo, opciones, orientacion,xtitulo,ytitulo,xopcion,yopcion,xi
     ventana.blit(titulo_menu, (xtitulo,ytitulo))
     imagenes = []
     for opcion in opciones:
-            imagenes.append(formatearOpcion(opcion))
+            imagenes.append(formatearOpcion(opcion, longitud_opciones))
     for i in range(len(imagenes)):
         if orientacion == "vertical":
             ventana.blit(imagenes[i], (xopcion, yopcion + (i * 60)))
         else:
-            ventana.blit(imagenes[i], (xopcion + (i * 210), yopcion))
+            ventana.blit(imagenes[i], (xopcion + (i * (longitud_opciones + longitud_opciones*0.05)), yopcion))
     introduzca_opcion = pygame.transform.scale(pygame.image.load("sources/sprites/introduceunaopcion.png"),(300, 50))
     ventana.blit(introduzca_opcion, (xintro,yintro))
     #postcondicion true
@@ -238,32 +236,70 @@ def ComerFicha(tablero, ficha_asesina, x_origen, y_origen, x_objetivo, y_objetiv
     return tablero
 
 
-#Funcion que maneja el menu de partida nueva
-def PartidaNueva():
+def controlador_juego(tablero, dificultad):
+    titulo_menu = pygame.transform.scale(pygame.image.load("sources/sprites/menujuego.png"), (400, 100))
+    while True:
+        DibujarTablero(tablero)
+        opciones_validas = ["1", "3", "4"]
+        opciones = ["jugar"]
+        if dificultad == 1 or dificultad == 4:
+            opciones.append("deshacer")
+            opciones_validas.append("2")
+        opciones.append("pausar")
+        opciones.append("terminar")
+        if dificultad == 4:
+            opciones.append("solucionar")
+            opciones_validas.append("5")
+        dibujarMenu("menujuego",  opciones, "horizontal", 100, 40, 20, 420, 20, 480, 100)
+        ventana.blit(imagenLeyenda, (360, 180))
+        pygame.display.update()
+        opcion = Leer(285, 495, color_lectura, 1, 311, 514)
+        #opcion = "1"
+        if opcion not in opciones_validas:
+            EntradaInvalida(imagenOpcioninvalida, 100,200, 1.5)
+        if opcion == "5" or opcion == "3":
+            EntradaInvalida(imagenEnConstruccion, 80,200,1.5)
+        if opcion == "1":
+            DibujarTablero(tablero)
+            ventana.blit(titulo_menu, (100, 40))
+            ventana.blit(imagenIntroducirCasillas,(200,400))
+            ventana.blit(imagenLeyenda, (360, 180))
+            pygame.display.update()
+            Leer(600,600, (color_lectura), 2,600,600)
+        """x = 3
+        y = 0
+        xobjetivo = 2
+        yobjetivo = 2
+        if (xobjetivo, yobjetivo) in PosicionesValidasCaballo(x, y, tablero):
+            tablero = ComerFicha(tablero, "C", x, y, xobjetivo, yobjetivo)"""
+    cerrar()
+
+#Funcion que maneja el menu de seleccionar nivel
+def SeleccionarNivel():
     #Precondicion: True
     while True:
         ventana.blit(imagenFondo, (0, 0))
         dibujarMenu("seleccionarnivel", ["facil", "dificil", "muydificil", "entrenamiento", "volver"], "vertical",
-                    100, 30, 200, 150, 150, 450)
+                    100, 30, 200, 150, 150, 450, 200)
         pygame.display.update()
-        #opcion = Leer(415, 465, color_lectura, 1, 440, 486)
-        opcion = "1"
+        opcion = Leer(415, 465, color_lectura, 1, 440, 486)
+        #opcion = "1"
         if opcion == "5":
             break
-        elif opcion == "1" or opcion == "2" or opcion == "4":
-            nivel = IntroducirNivel()
-            if validarString(nivel):
-                tablero = MatrizDeString(nivel)
-                DibujarTablero(tablero)
-                x = 3
-                y = 0
-                xobjetivo = 2
-                yobjetivo = 2
-                if (xobjetivo,yobjetivo) in PosicionesValidasCaballo(x, y, tablero):
-                    tablero = ComerFicha(tablero, "C", x, y, xobjetivo, yobjetivo)
-                DibujarTablero(tablero)
-                Leer(500, 500, (0,0,0), 2, 501, 501)
-                cerrar()
+        elif opcion == "1" or opcion == "2":
+            nivel_valido = False
+            while nivel_valido == False:
+                nivel = IntroducirNivel()
+                nivel_valido = validarString(nivel)
+                if nivel_valido == False:
+                    EntradaInvalida(imagenTableroInvalido, 100, 200, 1.5)
+            tablero = MatrizDeString(nivel)
+            controlador_juego(tablero, int(opcion))
+        elif opcion == "3" or opcion == "4":
+            EntradaInvalida(imagenEnConstruccion, 100,200, 1.5)
+        else:
+            EntradaInvalida(imagenOpcioninvalida, 100, 200, 1.5)
+
     #postcondicion true
 
 
@@ -278,18 +314,38 @@ def validarString(string) -> bool:
     #y en caso de tener 3 caracteres el primero debe ser "R","T","C","A","D", el segundo
     #debe ser una letra minuscula de entra a..d y ultimo un numero del 1 al 4
     #en ambos casos se debe retornar True, sino se retorna falso
+    #no deben haber mas de 2 peones,alfiles, caballos y torres, 1 sola reina y ajuro un rey
     try:
         assert(all(len(substring) >= 2  and len(substring) <=3 for substring in lista))
     except:
         print("Error de cantidad de caracteres en los substrings")
         return False
+    contador_peones = 0
+    contador_alfiles = 0
+    contador_caballos = 0
+    contador_rey = 0
+    contador_reina = 0
+    contador_torres = 0
     try:
         for substring in lista:
             if len(substring) == 2:
                 assert(substring[0] in ["a","b","c","d"] and substring[1] in ["1", "2", "3", "4"])
+                contador_peones += 1
             else:
                 assert (substring[1] in ["a", "b", "c", "d"] and substring[2] in ["1", "2", "3", "4"] \
                         and substring[0] in ["R", "T", "C", "A", "D"])
+                if substring[0] == "R":
+                    contador_rey += 1
+                elif substring[0] == "T":
+                    contador_torres += 1
+                elif substring[0] == "D":
+                    contador_reina += 1
+                elif substring[0] == "A":
+                    contador_alfiles += 1
+                elif substring[0] == "C":
+                    contador_caballos += 1
+        assert(contador_rey == 1 and  contador_reina <= 1 and contador_alfiles <= 2 and  contador_caballos <= 2 and
+               contador_torres <= 2 and contador_peones <= 2)
         return True
     except:
         print("Cantidad de carecteres no corresponde a los caracteres en el string")
@@ -299,9 +355,9 @@ def validarString(string) -> bool:
 #Funcion que maneja la confirmacion de salida
 def ConfirmacionSalida():
     #Precondicion: True
-    ventana.blit(imagenFondo, (0, 0))
-    dibujarMenu("salida",["si","no"],"horizontal",100,30,112,279,138,464)
     while True:
+        ventana.blit(imagenFondo, (0, 0))
+        dibujarMenu("salida", ["si", "no"], "horizontal", 100, 30, 112, 279, 138, 464, 200)
         pygame.display.update()
         opcion = Leer(403, 479, color_lectura, 1, 428, 500)
         #postcondicion opcion es 1 o 2
@@ -310,7 +366,7 @@ def ConfirmacionSalida():
         elif opcion == "2":
             break
         else:
-            print("opcion invalida")
+            EntradaInvalida(imagenOpcioninvalida, 100, 250, 1.5)
 
 
 def DibujarFicha(ficha, x, y):
@@ -475,11 +531,11 @@ def IntroducirNivel():
     while True:
         ventana.blit(imagenFondo, (0, 0))
         ventana.blit(imagenTitulo, (150, 20))
-        ventana.blit(imagenTexto, (10,346))
-        ventana.blit(imagenNivel, (100,100))
+        ventana.blit(imagenTexto, (10, 396))
+        ventana.blit(imagenNivel, (100, 180))
         pygame.display.update()
-        #nivel = Leer(20, 356, color_lectura, 44, 580,378)
-        nivel = "Cd1-b1-c3-c2"
+        #nivel = Leer(23, 407, color_lectura, 40, 580,431)
+        nivel = "Cd1-b1-c2-Ra2"
         #postcondicion nivel no es vacio
         try:
             assert(len(nivel) > 0)
@@ -523,43 +579,73 @@ def MenuPrincipal():
         ventana.blit(imagenFondo, (0,0))
         ventana.blit(imagenTitulo, (150, 20))
         dibujarMenu("menuprincipal", ["partidanueva", "cargarpartida", "mostrarrecords", "salirjuego"], "vertical",
-                    100, 180, 200, 300, 150, 540)
+                    100, 180, 200, 300, 150, 540, 200)
         pygame.display.update()
-        #opcion = Leer(415,555, color_lectura,1,440,575)
-        opcion = "1"
+        opcion = Leer(415,555, color_lectura,1,440,575)
+        #opcion = "1"
         if opcion == "1":
-            PartidaNueva()
+            SeleccionarNivel()
         elif opcion == "2":
-            print("Cargar!")
+            EntradaInvalida(imagenEnConstruccion, 80, 200, 2)
         elif opcion == "3":
-            print("Records!")
+            EntradaInvalida(imagenEnConstruccion, 800, 200, 2)
         elif opcion == "4":
             ConfirmacionSalida()
         else:
-            print("Error opcion invalida")
+            EntradaInvalida(imagenOpcioninvalida, 100,300, 1.5)
         # post condicion true
 
 def FormatearFicha(imagen):
     return pygame.transform.scale(imagen, (50,90))
+
+
+#funcion que nuestra el mensaje de entrada invalida correspondiente a la entrada en la que se equivoco el usuario
+def EntradaInvalida(imagen, x,y, tiempo):
+    ventana.blit(imagen, (x,y))
+    pygame.display.update()
+    time.sleep(tiempo)
+
+
+def MostrarTutorial():
+    ventana.blit(imagenFondo, (0,0))
+    ventana.blit(imagenTitulo, (150, 20))
+    ventana.blit(imagenTutorial, (100, 200))
+    pygame.display.update()
+    time.sleep(8)
+
 
 pygame.init()
 color_cielo = pygame.Color(25,158,218)
 color_lectura = pygame.Color(147, 55, 120)
 ventana = pygame.display.set_mode((600,600))
 pygame.display.set_caption("Solitaire Chess")
-imagenTitulo = pygame.transform.scale(pygame.image.load("sources/sprites/title.png"), (300,150))
-imagenFondo = pygame.image.load("sources/sprites/fondo.jpg")
-imagenTexto = pygame.image.load("sources/sprites/cuadrodetexto.png")
-imagenTablero = pygame.image.load("sources/sprites/tablero.jpg")
-imagenRey = FormatearFicha(pygame.image.load("sources/sprites/rey.png"))
-imagenAlfil = FormatearFicha(pygame.image.load("sources/sprites/alfil.png"))
-imagenReina = FormatearFicha(pygame.image.load("sources/sprites/reina.png"))
-imagenCaballo = FormatearFicha(pygame.image.load("sources/sprites/caballo.png"))
-imagenTorre = FormatearFicha(pygame.image.load("sources/sprites/torre.png"))
-imagenPeon = FormatearFicha(pygame.image.load("sources/sprites/peon.png"))
+direccion_imagenes = "sources/sprites/"
+imagenTitulo = pygame.transform.scale(pygame.image.load(direccion_imagenes + "title.png"), (300,150))
+imagenFondo = pygame.image.load(direccion_imagenes + "fondo.jpg")
+imagenTexto = pygame.image.load(direccion_imagenes + "cuadrodetexto.png")
+imagenTablero = pygame.image.load(direccion_imagenes + "tablero.jpg")
+imagenRey = FormatearFicha(pygame.image.load(direccion_imagenes + "rey.png"))
+imagenAlfil = FormatearFicha(pygame.image.load(direccion_imagenes + "alfil.png"))
+imagenReina = FormatearFicha(pygame.image.load(direccion_imagenes + "reina.png"))
+imagenCaballo = FormatearFicha(pygame.image.load(direccion_imagenes + "caballo.png"))
+imagenTorre = FormatearFicha(pygame.image.load(direccion_imagenes + "torre.png"))
+imagenPeon = FormatearFicha(pygame.image.load(direccion_imagenes + "peon.png"))
+imagenOpcioninvalida = pygame.image.load(direccion_imagenes + "opcioninvalida.png")
+imagenEnConstruccion = pygame.image.load(direccion_imagenes + "enconstruccion.png")
+imagenTableroInvalido = pygame.image.load(direccion_imagenes + "tableroinvalido.png")
+imagenTutorial = pygame.image.load(direccion_imagenes + "tutorial.png")
+imagenLeyenda =  pygame.transform.scale(pygame.image.load(direccion_imagenes + "leyenda.png"), (220,150))
+imagenIntroducirCasillas = pygame.transform.scale(pygame.image.load(direccion_imagenes + "introducircasillas.png"), (200,100))
 fuente = pygame.font.Font(None, 28)
-x_fichas = 114
-cambio_x = 76
-y_fichas = 190
-cambio_y = 50
+
+
+######cambiar los valores de estas variables
+#####para mover el tablero en la pantalla
+x_fichas = 44
+cambio_x = 76 #valor original 76
+y_fichas = 270
+cambio_y = 50 #valor original 50
+
+
+MostrarTutorial()
 MenuPrincipal()
