@@ -534,8 +534,8 @@ def IntroducirNivel():
         ventana.blit(imagenTexto, (10, 396))
         ventana.blit(imagenNivel, (100, 180))
         pygame.display.update()
-        #nivel = Leer(23, 407, color_lectura, 40, 580,431)
-        nivel = "Cd1-b1-c2-Ra2"
+        nivel = Leer(23, 407, color_lectura, 40, 580,431)
+        #nivel = "Cd1-b1-c2-Ra2"
         #postcondicion nivel no es vacio
         try:
             assert(len(nivel) > 0)
