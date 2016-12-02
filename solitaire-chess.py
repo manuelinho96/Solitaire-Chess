@@ -41,8 +41,8 @@ def Leer(x,y, color, longitud_maxima, xfinal, yfinal):
                     shift = True
                 elif event.key == 301: #presionar bloq mayus
                     bloq_mayus = True
-               if ((patron.match(pygame.key.name(event.key)) != None or pygame.key.name(event.key) == "[-]" or
-                        pygame.key.name(event.key) == "-") and len(string) < longitud_maxima):
+                if ((patron.match(pygame.key.name(event.key)) != None or pygame.key.name(event.key) == "[-]" or
+                    pygame.key.name(event.key) == "-") and len(string) < longitud_maxima):
                     # dibujar la letra, sumarle pixeles dependiendo de la longitud para que quede mas lejos la letra nueva
                     # recordar que se debe usar el color pasado por parametro
                     letra = pygame.key.name(event.key)
@@ -258,7 +258,9 @@ def controlador_juego(tablero, dificultad):
     if dificultad == 4:
         opciones.append("solucionar")
         opciones_validas.append("5")
+    tableroviejo = tablero
     while True:
+        print(tableroviejo)
         DibujarTablero(tablero)
         dibujarMenu("menujuego",  opciones, "horizontal", 100, 40, 20, 420, 20, 480, 100)
         ventana.blit(imagenLeyenda, (360, 180))
@@ -267,8 +269,13 @@ def controlador_juego(tablero, dificultad):
         #opcion = "1"
         if opcion not in opciones_validas:
             EntradaInvalida(imagenOpcioninvalida, 100,200, 1.5)
-        if opcion == "5" or opcion == "3":
+        if opcion == "5":
             EntradaInvalida(imagenEnConstruccion, 80,200,1.5)
+        if opcion == "2":
+            print("viejo",tableroviejo)
+            tablero = tableroviejo
+            print("nuevo",tablero)
+            EntradaInvalida(imagenDeshacerJugada, 80, 200, 1.5)
         if opcion == "1":
             DibujarInterfaz(tablero,titulo_menu)
             ventana.blit(imagenIntroducirCasillas,(200,400))
@@ -303,6 +310,8 @@ def controlador_juego(tablero, dificultad):
                 and (casilla_finalx,casilla_finaly) in (PosicionesValidasCaballo(casilla_inicialx,casilla_inicialy,tablero)))
                 or (ficha == "P"
                 and (casilla_finalx,casilla_finaly) in (PosicionesValidasAlfil(casilla_inicialx,casilla_inicialy,tablero,True))))):
+                    tableroviejo = tablero
+                    print("viejo dentro del if",tableroviejo)
                     tablero = ComerFicha(tablero,ficha,casilla_inicialx,casilla_inicialy,casilla_finalx,casilla_finaly)
                 else:
                     EntradaInvalida(imagenJugadaInvalida, 80, 200, 1.5)
@@ -678,6 +687,7 @@ imagenTutorial = pygame.image.load(direccion_imagenes + "tutorial.png")
 imagenLeyenda =  pygame.transform.scale(pygame.image.load(direccion_imagenes + "leyenda.png"), (220,150))
 imagenIntroducirCasillas = pygame.transform.scale(pygame.image.load(direccion_imagenes + "introducircasillas.png"), (200,100))
 imagenJugadaInvalida = pygame.transform.scale(pygame.image.load(direccion_imagenes + "jugadainvalida.png"), (300,200))
+imagenDeshacerJugada = pygame.transform.scale(pygame.image.load(direccion_imagenes + "deshacerjugada.png"), (300,200))
 fuente = pygame.font.Font(None, 28)
 
 
