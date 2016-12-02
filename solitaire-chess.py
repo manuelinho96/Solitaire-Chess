@@ -245,11 +245,80 @@ def ComerFicha(tablero, ficha_asesina, x_origen, y_origen, x_objetivo, y_objetiv
     tablero[x_objetivo][y_objetivo] = ficha_asesina
     return tablero
 
+#Funcion que dada una lista de fichas en el tablero determina si el jugador gano la partida.
+def VerificarGanador(fichasdeltablero) -> bool:
+    victoria = False
+    #Precondicion: True
+    if len(fichasdeltablero) == 1:
+        victoria = True
+    #Postcondicion:
+    assert((len(fichasdeltablero) == 1 and victoria) or (len(fichasdeltablero) !=1 and victoria == False))
+    return victoria
+
+#Funcion que dado un tablero verifica si el jugador ha perdido la partida.
+def VerificarPerdedor(tablero) -> bool:
+    posiciones_validas=[]
+    perdedor = False
+    #Precondicion: True
+    for x in range(4):
+        for y in range(4):
+            if tablero[x][y] != "":
+                if tablero[x][y] == "P":
+                    posiciones_validas = posiciones_validas + PosicionesValidasAlfil(x, y, tablero, True)
+                if tablero[x][y] == "A" or tablero[x][y] == "D":
+                    posiciones_validas = posiciones_validas + PosicionesValidasAlfil(x, y, tablero, False)
+                if tablero[x][y] == "T" or tablero[x][y] == "D":
+                    posiciones_validas = posiciones_validas + PosicionesValidasTorre(x, y, tablero)
+                if tablero[x][y] == "R":
+                    posiciones_validas = posiciones_validas + PosicionesValidasRey(x, y, tablero)
+                if tablero[x][y] == "C":
+                    posiciones_validas = posiciones_validas + PosicionesValidasCaballo(x, y, tablero, False)
+    if len(posiciones_validas) == 0:
+        perdedor = True
+        #Postcondicion:
+        assert((perdedor and len(posiciones_validas) == 0) or (perdedor == False and any(x in posiciones_validas)))
+    return perdedor
+
+#Funcion que muestra menu de guardar partida y ejecuta esta accion en caso de que el usuario asi lo desee
+def GuardarPartida():
+    #Precondicion: True
+    while True:
+        ventana.blit(imagenFondo, (0, 0))
+        dibujarMenu("GuardarPartida", ["si", "no"], "horizontal", 100, 50, 112, 279, 138, 464, 200)
+        pygame.display.update()
+        opcion = Leer(403, 479, color_lectura, 1, 428, 500)
+        if opcion == "1":
+            pass
+        elif opcion == "2":
+            break
+        else:
+            MostrarMensaje(imagenOpcioninvalida, 100, 250, 1.5)
+    #Postcondicion:
+
+
+#Funcion que muestra el menu de terminar una partida
+def TerminarPartida():
+    #Precondicion: True
+    while True:
+        ventana.blit(imagenFondo, (0, 0))
+        dibujarMenu("TerminarPartida", ["si", "no"], "horizontal", 100, 50, 112, 279, 138, 464, 200)
+        pygame.display.update()
+        opcion = Leer(403, 479, color_lectura, 1, 428, 500)
+        if opcion == "1":
+            GuardarPartida()
+        elif opcion == "2":
+            break
+        else:
+            MostrarMensaje(imagenOpcioninvalida, 100, 250, 1.5)
+    #Postcondicion: True
+
 
 def controlador_juego(tablero, dificultad):
     titulo_menu = pygame.transform.scale(pygame.image.load("sources/sprites/menujuego.png"), (400, 100))
     opciones_validas = ["1", "3", "4"]
     opciones = ["jugar"]
+    ganador = False
+    perdedor = False
     if dificultad == 1 or dificultad == 4:
         opciones.append("deshacer")
         opciones_validas.append("2")
@@ -260,45 +329,47 @@ def controlador_juego(tablero, dificultad):
         opciones_validas.append("5")
     tableroviejo = tablero
     while True:
-        print(tableroviejo)
+        perdedor = VerificarPerdedor(tablero)
         DibujarTablero(tablero)
         dibujarMenu("menujuego",  opciones, "horizontal", 100, 40, 20, 420, 20, 480, 100)
         ventana.blit(imagenLeyenda, (360, 180))
         pygame.display.update()
+        if perdedor:
+            MostrarMensaje(imagenDerrota, 200, 100, 5)
+            break
         opcion = Leer(285, 495, color_lectura, 1, 311, 514)
-        #opcion = "1"
         if opcion not in opciones_validas:
-            EntradaInvalida(imagenOpcioninvalida, 100,200, 1.5)
+            MostrarMensaje(imagenOpcioninvalida, 100,200, 1.5)
+        if opcion == "4":
+            TerminarPartida()
         if opcion == "5":
-            EntradaInvalida(imagenEnConstruccion, 80,200,1.5)
+            MostrarMensaje(imagenEnConstruccion, 80,200,1.5)
         if opcion == "2":
-            print("viejo",tableroviejo)
             tablero = tableroviejo
-            print("nuevo",tablero)
-            EntradaInvalida(imagenDeshacerJugada, 80, 200, 1.5)
+            MostrarMensaje(imagenDeshacerJugada, 80, 200, 1.5)
         if opcion == "1":
             DibujarInterfaz(tablero,titulo_menu)
             ventana.blit(imagenIntroducirCasillas,(200,400))
             pygame.display.update()
-            casilla_inicial = Leer(359, 461, (color_lectura), 2, 359+26, 461+21)
+            casilla_inicial = Leer(354, 436, (color_lectura), 2, 354+33, 436+20)
             valida = True
             if validarString(casilla_inicial, "Introducir Casilla"):
                 casilla_inicialx=ord(casilla_inicial[0])-97
                 casilla_inicialy=int(casilla_inicial[1])-1
                 if tablero[casilla_inicialx][casilla_inicialy] == "":
                     valida = False
-                    EntradaInvalida(imagenJugadaInvalida, 80, 200, 1.5)
+                    MostrarMensaje(imagenJugadaInvalida, 80, 200, 1.5)
             else:
                 valida = False
-                EntradaInvalida(imagenJugadaInvalida, 80, 200, 1.5)
+                MostrarMensaje(imagenJugadaInvalida, 80, 200, 1.5)
             if valida:
-                casilla_final = Leer(359, 470, (color_lectura), 2, 359+26, 470+21)
-                if validarString(casilla_inicial, "Introducir Casilla"):
+                casilla_final = Leer(354, 470, (color_lectura), 2, 354+34, 470+21)
+                if validarString(casilla_final, "Introducir Casilla"):
                     casilla_finalx=ord(casilla_final[0])-97
                     casilla_finaly=int(casilla_final[1])-1
                 else:
                     valida = False
-                    EntradaInvalida(imagenJugadaInvalida, 80, 200, 1.5)
+                    MostrarMensaje(imagenJugadaInvalida, 80, 200, 1.5)
                 ficha = tablero[casilla_inicialx][casilla_inicialy]
                 if (valida and
                 ((ficha == "R" and (casilla_finalx,casilla_finaly) in PosicionesValidasRey(casilla_inicialx,casilla_inicialy,tablero))
@@ -311,11 +382,14 @@ def controlador_juego(tablero, dificultad):
                 or (ficha == "P"
                 and (casilla_finalx,casilla_finaly) in (PosicionesValidasAlfil(casilla_inicialx,casilla_inicialy,tablero,True))))):
                     tableroviejo = copy.deepcopy(tablero)
-                    print("viejo dentro del if",tableroviejo)
                     tablero = ComerFicha(tablero,ficha,casilla_inicialx,casilla_inicialy,casilla_finalx,casilla_finaly)
                 else:
-                    EntradaInvalida(imagenJugadaInvalida, 80, 200, 1.5)
-    cerrar()
+                    MostrarMensaje(imagenJugadaInvalida, 80, 200, 1.5)
+            fichas_del_tablero = [x for y in tablero for x in y if x != ""]
+            ganador = VerificarGanador(fichas_del_tablero)
+            if ganador:
+                MostrarMensaje(imagenVictoria, 40, 100, 5)
+                break
 
 
 #Funcion que maneja el menu de seleccionar nivel
@@ -336,14 +410,13 @@ def SeleccionarNivel():
                 nivel = IntroducirNivel()
                 nivel_valido = validarString(nivel,"Introducir Nivel")
                 if nivel_valido == False:
-                    EntradaInvalida(imagenTableroInvalido, 100, 200, 1.5)
+                    MostrarMensaje(imagenTableroInvalido, 100, 200, 1.5)
             tablero = MatrizDeString(nivel)
             controlador_juego(tablero, int(opcion))
         elif opcion == "3" or opcion == "4":
-            EntradaInvalida(imagenEnConstruccion, 100,200, 1.5)
+            MostrarMensaje(imagenEnConstruccion, 100,200, 1.5)
         else:
-            EntradaInvalida(imagenOpcioninvalida, 100, 200, 1.5)
-
+            MostrarMensaje(imagenOpcioninvalida, 100, 200, 1.5)
     #postcondicion true
 
 
@@ -352,7 +425,6 @@ def validarString(string,menu) -> bool:
     #precondicion la string debe tener al menos un caracter
     assert(len(string) >= 0)
     lista = string.split("-")
-    print(lista)
     #POSTCONDICION = la funcion debe retornar True si la string al separarla por -
     #se divide en substring de 2 o 3 caracteres, cuando tiene 2 caracteres el primero
     #debe ser una letra minuscula entra a..d y el segundo un numero del 1 al 4
@@ -391,7 +463,7 @@ def validarString(string,menu) -> bool:
                     contador_caballos += 1
         if menu == "Introducir Nivel":
             assert(contador_rey == 1 and  contador_reina <= 1 and contador_alfiles <= 2 and  contador_caballos <= 2 and
-               contador_torres <= 2 and contador_peones <= 2)
+               contador_torres <= 2 and contador_peones <= 2 and len(lista)>=2)
             return True
         elif menu == "Introducir Casilla":
             return True
@@ -414,7 +486,7 @@ def ConfirmacionSalida():
         elif opcion == "2":
             break
         else:
-            EntradaInvalida(imagenOpcioninvalida, 100, 250, 1.5)
+            MostrarMensaje(imagenOpcioninvalida, 100, 250, 1.5)
 
 
 def DibujarFicha(ficha, x, y):
@@ -567,8 +639,8 @@ def PosicionesValidasRey(xorigen,yorigen,tablero):
             posiciones_validas.append((xorigen - 1, y))
         if xorigen != 3 and tablero[xorigen+1][y] != "":
             posiciones_validas.append((xorigen + 1, y))
-        if y != yorigen and tablero[0][y] != "":
-            posiciones_validas.append((0,y))
+        if y != yorigen and tablero[xorigen][y] != "":
+            posiciones_validas.append((xorigen,y))
     return posiciones_validas
     #Postcondicion
 
@@ -635,21 +707,21 @@ def MenuPrincipal():
         if opcion == "1":
             SeleccionarNivel()
         elif opcion == "2":
-            EntradaInvalida(imagenEnConstruccion, 80, 200, 2)
+            MostrarMensaje(imagenEnConstruccion, 80, 200, 2)
         elif opcion == "3":
-            EntradaInvalida(imagenEnConstruccion, 800, 200, 2)
+            MostrarMensaje(imagenEnConstruccion, 800, 200, 2)
         elif opcion == "4":
             ConfirmacionSalida()
         else:
-            EntradaInvalida(imagenOpcioninvalida, 100,300, 1.5)
+            MostrarMensaje(imagenOpcioninvalida, 100,300, 1.5)
         # post condicion true
 
 def FormatearFicha(imagen):
     return pygame.transform.scale(imagen, (50,90))
 
 
-#funcion que nuestra el mensaje de entrada invalida correspondiente a la entrada en la que se equivoco el usuario
-def EntradaInvalida(imagen, x,y, tiempo):
+#funcion que un mensaje especial
+def MostrarMensaje(imagen, x,y, tiempo):
     ventana.blit(imagen, (x,y))
     pygame.display.update()
     time.sleep(tiempo)
@@ -688,6 +760,10 @@ imagenLeyenda =  pygame.transform.scale(pygame.image.load(direccion_imagenes + "
 imagenIntroducirCasillas = pygame.transform.scale(pygame.image.load(direccion_imagenes + "introducircasillas.png"), (200,100))
 imagenJugadaInvalida = pygame.transform.scale(pygame.image.load(direccion_imagenes + "jugadainvalida.png"), (300,200))
 imagenDeshacerJugada = pygame.transform.scale(pygame.image.load(direccion_imagenes + "deshacerjugada.png"), (300,200))
+imagenVictoria = pygame.image.load(direccion_imagenes + "ganador.png")
+imagenDerrota = pygame.image.load(direccion_imagenes + "derrota.png")
+imagenGuardarPartida = pygame.image.load(direccion_imagenes + "guardarpartida.png")
+imagenTerminarPartida = pygame.image.load(direccion_imagenes + "terminarpartida.png")
 fuente = pygame.font.Font(None, 28)
 
 
