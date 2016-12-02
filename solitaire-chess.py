@@ -1,4 +1,4 @@
-import pygame, sys, re, time
+import pygame, sys, re, time, copy
 from pygame.locals import *
 
 shift = False #variable booleana que indica el estado de la tecla shift
@@ -310,7 +310,7 @@ def controlador_juego(tablero, dificultad):
                 and (casilla_finalx,casilla_finaly) in (PosicionesValidasCaballo(casilla_inicialx,casilla_inicialy,tablero)))
                 or (ficha == "P"
                 and (casilla_finalx,casilla_finaly) in (PosicionesValidasAlfil(casilla_inicialx,casilla_inicialy,tablero,True))))):
-                    tableroviejo = tablero
+                    tableroviejo = copy.deepcopy(tablero)
                     print("viejo dentro del if",tableroviejo)
                     tablero = ComerFicha(tablero,ficha,casilla_inicialx,casilla_inicialy,casilla_finalx,casilla_finaly)
                 else:
