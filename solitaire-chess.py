@@ -685,10 +685,11 @@ def IntroducirNivel():
         ventana.blit(imagenFondo, (0, 0))
         ventana.blit(imagenTitulo, (150, 20))
         ventana.blit(imagenTexto, (10, 396))
-        ventana.blit(imagenNivel, (100, 180))
+        ventana.blit(imagenNivel, (100, 40))
+        ventana.blit(pygame.image.load(direccion_imagenes + "maximo10fichas.png"), (120, 260))
         pygame.display.update()
-        #nivel = Leer(23, 407, color_lectura, 40, 580,431)
-        nivel = "Ca3-b1-Rc1"
+        nivel = Leer(23, 407, color_lectura, 40, 580,431)
+        #nivel = "Ca3-b1-Rc1"
         #postcondicion nivel no es vacio
         try:
             assert(len(nivel) > 0)
@@ -758,6 +759,15 @@ def MostrarMensaje(imagen, x,y, tiempo):
     pygame.display.update()
     time.sleep(tiempo)
 
+
+def IntroducirNombre():
+    ventana.blit(imagenFondo, (0, 0))
+    ventana.blit(imagenTexto, (10, 396))
+    ventana.blit(imagenNombre, (100, 40))
+    ventana.blit(pygame.image.load(direccion_imagenes + "maximo10caracteres.png"), (88,240))
+    nombre = Leer(23, 407, color_lectura, 10, 580,431)
+    return nombre
+
 #Funcion que indica al usuario como realizar sus acciones.
 def MostrarTutorial():
     #Precondicion: True
@@ -796,6 +806,7 @@ imagenVictoria = pygame.image.load(direccion_imagenes + "ganador.png")
 imagenDerrota = pygame.image.load(direccion_imagenes + "derrota.png")
 imagenGuardarPartida = pygame.image.load(direccion_imagenes + "guardarpartida.png")
 imagenTerminarPartida = pygame.image.load(direccion_imagenes + "terminarpartida.png")
+imagenNombre = pygame.image.load(direccion_imagenes + "introducirnombre.png")
 fuente = pygame.font.Font(None, 28)
 
 
@@ -806,6 +817,6 @@ cambio_x = 76 #valor original 76
 y_fichas = 270
 cambio_y = 50 #valor original 50
 
-
-MostrarTutorial()
+#MostrarTutorial()
+nombre_jugador = IntroducirNombre()
 MenuPrincipal()
