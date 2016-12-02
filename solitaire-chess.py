@@ -314,7 +314,7 @@ def GuardarPartida(tablero, dificultad):
         opcion = Leer(403, 479, color_lectura, 1, 428, 500)
         if opcion == "1":
             partida_string =  StringDeTablero(tablero)
-            string = "Partida N FECHA TIEMPO" + dificultades[dificultad] + " " + partida_string + "\n"
+            string = "Partida N FECHA TIEMPO" + dificultades[dificultad] + " " + partida_string + "" +nombre_jugador +"\n"
             EscribirEnArchivo(string)
             break
         elif opcion == "2":
@@ -762,10 +762,10 @@ def MostrarMensaje(imagen, x,y, tiempo):
 
 def IntroducirNombre():
     ventana.blit(imagenFondo, (0, 0))
-    ventana.blit(imagenTexto, (10, 396))
+    ventana.blit(pygame.image.load(direccion_imagenes + "cuadronombre.png"), (180, 396))
     ventana.blit(imagenNombre, (100, 40))
     ventana.blit(pygame.image.load(direccion_imagenes + "maximo10caracteres.png"), (88,240))
-    nombre = Leer(23, 407, color_lectura, 10, 580,431)
+    nombre = Leer(200, 415, color_lectura, 10, 386,440)
     return nombre
 
 #Funcion que indica al usuario como realizar sus acciones.
