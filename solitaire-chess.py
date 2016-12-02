@@ -28,11 +28,22 @@ def Leer(x,y, color, longitud_maxima, xfinal, yfinal):
     texto = ""
     global shift
     global bloq_mayus
+    global tiempo_maximo
+    global tiempo_actual
+    global contar_tiempo
     while True:#
         pygame.display.update()
         pygame.draw.rect(ventana, (0, 0, 0), rectangulo)
         texto = fuente.render(string, 1, (255, 120, 255))
         ventana.blit(texto, (x + 7, y + 1))
+        global tiempo_viejo
+        global tiempo
+        if contar_tiempo and int(tiempo_viejo) < pygame.time.get_ticks()/1000:
+            tiempo_viejo += 1
+            tiempo += 1
+            tiempo_actual = tiempo_maximo - tiempo
+            if tiempo_actual <= 0:
+                return "perdida_por_tiempo"
         for event in pygame.event.get():
             if event.type == QUIT:
                     cerrar()
@@ -227,7 +238,7 @@ def BusquedaHorizontal(x_inicial, x_final, y, direccion, tablero):
 def DibujarInterfaz(tablero,titulomenu):
     #Precondicion: True
     DibujarTablero(tablero)
-    ventana.blit(titulomenu, (100, 40))
+    ventana.blit(titulomenu, (100, 20))
     ventana.blit(imagenLeyenda, (360, 180))
     #Postcondicion: True
 
@@ -359,20 +370,39 @@ def controlador_juego(tablero, dificultad):
         opciones_validas.append("5")
     tableroviejo = tablero
     salir = False
+    global tiempo_maximo
+    global contar_tiempo
+    contar_tiempo = True
+    if dificultad == 1:
+        tiempo_maximo = 5
+    elif dificultad == 2:
+        tiempo_maximo = 90
+    global tiempo
+    tiempo = 0
+    global tiempo_viejo
+    tiempo_viejo = pygame.time.get_ticks() / 1000
+    global tiempo_actual
     while True:
+        tiempo_actual = tiempo_maximo - tiempo
         perdedor = VerificarPerdedor(tablero)
         DibujarTablero(tablero)
-        dibujarMenu("menujuego",  opciones, "horizontal", 100, 40, 20, 420, 20, 480, 100)
+        dibujarMenu("menujuego",  opciones, "horizontal", 100, 20, 20, 420, 20, 480, 100)
         ventana.blit(imagenLeyenda, (360, 180))
         pygame.display.update()
         if perdedor:
             MostrarMensaje(imagenDerrota, 130, 100, 5)
+            contar_tiempo = False
             break
         opcion = Leer(285, 495, color_lectura, 1, 311, 514)
+        if opcion == "perdida_por_tiempo":
+            MostrarMensaje(imagenDerrota, 130, 100, 5)
+            contar_tiempo = False
+            break
         if opcion not in opciones_validas:
             MostrarMensaje(imagenOpcioninvalida, 100,200, 1.5)
         if opcion == "4":
             salir = TerminarPartida(tablero, dificultad)
+            contar_tiempo = False
         if opcion == "5":
             MostrarMensaje(imagenEnConstruccion, 80,200,1.5)
         if opcion == "2":
@@ -420,6 +450,7 @@ def controlador_juego(tablero, dificultad):
             ganador = VerificarGanador(fichas_del_tablero)
             if ganador:
                 MostrarMensaje(imagenVictoria, 40, 100, 5)
+                contar_tiempo = False
                 break
         if salir:
             break
@@ -554,10 +585,13 @@ def MoverFicha(fila, columna, filafinal, columnafinal, tablero, ficha):
     tiempo_inicio = pygame.time.get_ticks()
     tablero[fila][columna] = ""
     # precondicion x,y,xf,yf deben estar entre 0 y 600
+    global error_de_tiempo
+    global tiempo_viejo
     x = x_fichas + (fila * cambio_x)
     y = y_fichas - (columna * cambio_y)
     xf = x_fichas + (filafinal * cambio_x)
     yf = y_fichas - (columnafinal * cambio_y)
+    tiempo_viejo = pygame.time.get_ticks()/1000
     assert(x >= 0 and x <= 600 and xf >= 0 and xf <= 600 and y >= 0 and y <= 600 and yf >= 0 and yf <= 600)
     i = 0
     while i <= 1:
@@ -573,6 +607,10 @@ def MoverFicha(fila, columna, filafinal, columnafinal, tablero, ficha):
         DibujarInterfaz(tablero,titulo_menu)
         DibujarFicha(ficha, x_actual, y_actual)
         pygame.display.update()
+        if int(tiempo_viejo) < pygame.time.get_ticks()/1000:
+            error_de_tiempo += 1
+            tiempo_viejo += 1
+            print("corrigiendo error de tiempo")
     # postcondicion True
 
 
@@ -634,10 +672,10 @@ def PosicionesValidasAlfil(xorigen, yorigen, tablero, espeon):
     else:
         distanciamaxima = 4
         distanciamaxima2 = 0
-    if  not espeon:
+    if not espeon:
         for x in range(xorigen):
             if BusquedaDiagonalSimetrica(xorigen, x, yorigen, "negativa", tablero):
-                posiciones_validas.append((x, yorigen - x + xorigen))
+                posiciones_validas.append((x, yorigen - (xorigen - x)))
                 break
         for x in range(xorigen + 1, 4):
             if BusquedaDiagonalAsimetrica(xorigen, x, yorigen, "positiva", tablero):
@@ -688,8 +726,8 @@ def IntroducirNivel():
         ventana.blit(imagenNivel, (100, 40))
         ventana.blit(pygame.image.load(direccion_imagenes + "maximo10fichas.png"), (120, 260))
         pygame.display.update()
-        nivel = Leer(23, 407, color_lectura, 40, 580,431)
-        #nivel = "Ca3-b1-Rc1"
+        #nivel = Leer(23, 407, color_lectura, 40, 580,431)
+        nivel = "Ca1-b2-Rc3-Dd4"
         #postcondicion nivel no es vacio
         try:
             assert(len(nivel) > 0)
@@ -784,7 +822,7 @@ color_lectura = pygame.Color(147, 55, 120)
 ventana = pygame.display.set_mode((600,600))
 pygame.display.set_caption("Solitaire Chess")
 direccion_imagenes = "sources/sprites/"
-direccion_imagenes_numeros = "sources/sprites/numeros"
+direccion_imagenes_numeros = "sources/sprites/numeros/"
 imagenTitulo = pygame.transform.scale(pygame.image.load(direccion_imagenes + "title.png"), (300,150))
 imagenFondo = pygame.image.load(direccion_imagenes + "fondo.jpg")
 imagenTexto = pygame.image.load(direccion_imagenes + "cuadrodetexto.png")
@@ -821,13 +859,20 @@ imagenDospuntos = pygame.image.load(direccion_imagenes_numeros + "dospuntos.png"
 imagenNombre = pygame.image.load(direccion_imagenes + "introducirnombre.png")
 fuente = pygame.font.Font(None, 28)
 
+#variables para controlar el tiempo
+contar_tiempo = False
+tiempo_viejo = pygame.time.get_ticks()/1000
+tiempo_actual = 0
+tiempo = 0
+tiempo_maximo = 0
+error_de_tiempo = 0 # no se debe contar el tiempo mientras el usuario no puede introducir informacion
 
 ######cambiar los valores de estas variables
 #####para mover el tablero en la pantalla
 x_fichas = 54
 cambio_x = 70 #valor original 76
 y_fichas = 250
-cambio_y = 48 #valor original 50
+cambio_y = 41 #valor original 50
 
 #MostrarTutorial()
 nombre_jugador = IntroducirNombre()
