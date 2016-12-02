@@ -335,7 +335,7 @@ def controlador_juego(tablero, dificultad):
         ventana.blit(imagenLeyenda, (360, 180))
         pygame.display.update()
         if perdedor:
-            MostrarMensaje(imagenDerrota, 200, 100, 5)
+            MostrarMensaje(imagenDerrota, 130, 100, 5)
             break
         opcion = Leer(285, 495, color_lectura, 1, 311, 514)
         if opcion not in opciones_validas:
@@ -508,7 +508,7 @@ def DibujarTablero(tablero):
     filas = len(tablero)
     columnas = len(tablero[0])
     ventana.blit(imagenFondo, (0,0))
-    ventana.blit(imagenTablero, (x_fichas - 14, y_fichas - 90))
+    ventana.blit(imagenTablero, (x_fichas - 34, y_fichas - 70))
     for fila in range(filas):
         for columna in range(columnas):
             # se trabaja con la posicion columnas - columna para que se dubijen de arriba a abajo
@@ -742,10 +742,11 @@ color_lectura = pygame.Color(147, 55, 120)
 ventana = pygame.display.set_mode((600,600))
 pygame.display.set_caption("Solitaire Chess")
 direccion_imagenes = "sources/sprites/"
+direccion_imagenes_numeros = "sources/sprites/numeros"
 imagenTitulo = pygame.transform.scale(pygame.image.load(direccion_imagenes + "title.png"), (300,150))
 imagenFondo = pygame.image.load(direccion_imagenes + "fondo.jpg")
 imagenTexto = pygame.image.load(direccion_imagenes + "cuadrodetexto.png")
-imagenTablero = pygame.image.load(direccion_imagenes + "tablero.jpg")
+imagenTablero = pygame.transform.scale(pygame.image.load(direccion_imagenes + "tablero.png"), (310,204))
 imagenRey = FormatearFicha(pygame.image.load(direccion_imagenes + "rey.png"))
 imagenAlfil = FormatearFicha(pygame.image.load(direccion_imagenes + "alfil.png"))
 imagenReina = FormatearFicha(pygame.image.load(direccion_imagenes + "reina.png"))
@@ -764,15 +765,26 @@ imagenVictoria = pygame.image.load(direccion_imagenes + "ganador.png")
 imagenDerrota = pygame.image.load(direccion_imagenes + "derrota.png")
 imagenGuardarPartida = pygame.image.load(direccion_imagenes + "guardarpartida.png")
 imagenTerminarPartida = pygame.image.load(direccion_imagenes + "terminarpartida.png")
+imagenUno = pygame.image.load(direccion_imagenes_numeros + "uno.png")
+imagenDos = pygame.image.load(direccion_imagenes_numeros + "dos.png")
+imagenTres = pygame.image.load(direccion_imagenes_numeros + "tres.png")
+imagenCuatro = pygame.image.load(direccion_imagenes_numeros + "cuatro.png")
+imagenCinco = pygame.image.load(direccion_imagenes_numeros + "cinco.png")
+imagenSeis = pygame.image.load(direccion_imagenes_numeros + "seis.png")
+imagenSiete = pygame.image.load(direccion_imagenes_numeros + "siete.png")
+imagenOcho = pygame.image.load(direccion_imagenes_numeros + "ocho.png")
+imagenNueve = pygame.image.load(direccion_imagenes_numeros + "nueve.png")
+imagenCero = pygame.image.load(direccion_imagenes_numeros + "cero.png")
+imagenDospuntos = pygame.image.load(direccion_imagenes_numeros + "dospuntos.png")
 fuente = pygame.font.Font(None, 28)
 
 
 ######cambiar los valores de estas variables
 #####para mover el tablero en la pantalla
-x_fichas = 44
-cambio_x = 76 #valor original 76
-y_fichas = 270
-cambio_y = 50 #valor original 50
+x_fichas = 54
+cambio_x = 70 #valor original 76
+y_fichas = 250
+cambio_y = 48 #valor original 50
 
 
 MostrarTutorial()
