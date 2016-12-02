@@ -272,23 +272,51 @@ def VerificarPerdedor(tablero) -> bool:
                 if tablero[x][y] == "R":
                     posiciones_validas = posiciones_validas + PosicionesValidasRey(x, y, tablero)
                 if tablero[x][y] == "C":
-                    posiciones_validas = posiciones_validas + PosicionesValidasCaballo(x, y, tablero, False)
+                    posiciones_validas = posiciones_validas + PosicionesValidasCaballo(x, y, tablero)
     if len(posiciones_validas) == 0:
         perdedor = True
         #Postcondicion:
         assert((perdedor and len(posiciones_validas) == 0) or (perdedor == False and any(x in posiciones_validas)))
     return perdedor
 
+
+#funcion que genera un string de una matriz tablero
+def StringDeTablero(tablero):
+    string = ""
+    cantidad_fichas = len([x for y in tablero for x in y if x != ""])
+    contador_fichas_agregadas = 0
+    for x in range(len(tablero)):
+        for y in range(len(tablero)):
+            if tablero[x][y] != "":
+                if tablero[x][y] != "P":
+                    string += tablero[x][y] + chr(x + 97) + str(y + 1)
+                else:
+                    string += chr(x + 97) + str(y + 1)
+                contador_fichas_agregadas += 1
+                if contador_fichas_agregadas < cantidad_fichas:
+                    string += "-"
+    return string
+
+
+def EscribirEnArchivo(string):
+    with open("sources/files/partidasguardadas.txt", "a") as archivoSalida:
+        archivoSalida.write(string)
+
+
 #Funcion que muestra menu de guardar partida y ejecuta esta accion en caso de que el usuario asi lo desee
-def GuardarPartida():
+def GuardarPartida(tablero, dificultad):
     #Precondicion: True
+    dificultades = ["facil", "dificil"]
     while True:
         ventana.blit(imagenFondo, (0, 0))
         dibujarMenu("GuardarPartida", ["si", "no"], "horizontal", 100, 50, 112, 279, 138, 464, 200)
         pygame.display.update()
         opcion = Leer(403, 479, color_lectura, 1, 428, 500)
         if opcion == "1":
-            pass
+            partida_string =  StringDeTablero(tablero)
+            string = "Partida N FECHA TIEMPO" + dificultades[dificultad] + " " + partida_string + "\n"
+            EscribirEnArchivo(string)
+            break
         elif opcion == "2":
             break
         else:
@@ -297,7 +325,7 @@ def GuardarPartida():
 
 
 #Funcion que muestra el menu de terminar una partida
-def TerminarPartida():
+def TerminarPartida(tablero, dificultad):
     #Precondicion: True
     while True:
         ventana.blit(imagenFondo, (0, 0))
@@ -305,7 +333,9 @@ def TerminarPartida():
         pygame.display.update()
         opcion = Leer(403, 479, color_lectura, 1, 428, 500)
         if opcion == "1":
-            GuardarPartida()
+            if dificultad >= 1 and dificultad <= 2:
+                GuardarPartida(tablero, dificultad)
+            return True
         elif opcion == "2":
             break
         else:
@@ -328,6 +358,7 @@ def controlador_juego(tablero, dificultad):
         opciones.append("solucionar")
         opciones_validas.append("5")
     tableroviejo = tablero
+    salir = False
     while True:
         perdedor = VerificarPerdedor(tablero)
         DibujarTablero(tablero)
@@ -341,7 +372,7 @@ def controlador_juego(tablero, dificultad):
         if opcion not in opciones_validas:
             MostrarMensaje(imagenOpcioninvalida, 100,200, 1.5)
         if opcion == "4":
-            TerminarPartida()
+            salir = TerminarPartida(tablero, dificultad)
         if opcion == "5":
             MostrarMensaje(imagenEnConstruccion, 80,200,1.5)
         if opcion == "2":
@@ -390,7 +421,8 @@ def controlador_juego(tablero, dificultad):
             if ganador:
                 MostrarMensaje(imagenVictoria, 40, 100, 5)
                 break
-
+        if salir:
+            break
 
 #Funcion que maneja el menu de seleccionar nivel
 def SeleccionarNivel():
@@ -655,8 +687,8 @@ def IntroducirNivel():
         ventana.blit(imagenTexto, (10, 396))
         ventana.blit(imagenNivel, (100, 180))
         pygame.display.update()
-        nivel = Leer(23, 407, color_lectura, 40, 580,431)
-        #nivel = "Cd1-b1-c2-Ra2"
+        #nivel = Leer(23, 407, color_lectura, 40, 580,431)
+        nivel = "Ca3-b1-Rc1"
         #postcondicion nivel no es vacio
         try:
             assert(len(nivel) > 0)
