@@ -59,7 +59,7 @@ def Leer(x,y, color, longitud_maxima, xfinal, yfinal):
             tiempo_viejo += 1
             tiempo += 1
             tiempo_actual = tiempo_maximo - tiempo
-            if tiempo_actual <= 0:
+            if tiempo_actual <= -1:
                 return "perdida_por_tiempo"
         for event in pygame.event.get():
             if event.type == QUIT:
