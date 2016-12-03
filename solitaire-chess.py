@@ -256,7 +256,12 @@ def DibujarInterfaz(tablero,titulomenu):
     #Precondicion: True
     DibujarTablero(tablero)
     ventana.blit(titulomenu, (100, 20))
-    ventana.blit(imagenLeyenda, (360, 180))
+    ventana.blit(imagenLeyenda, (360, 190))
+    ventana.blit(pygame.image.load(direccion_imagenes + "cuadronombre.png"), (360, 124))
+    rectangulo = pygame.Rect(381, 143, 186, 24)
+    pygame.draw.rect(ventana, (0, 0, 0), rectangulo)
+    texto = fuente.render(nombre_jugador, 1, (255, 120, 255))
+    ventana.blit(texto, (385, 145))
     #Postcondicion: True
 
 # funcion que controla cuando una ficha come a otra
@@ -404,7 +409,13 @@ def controlador_juego(tablero, dificultad):
         perdedor = VerificarPerdedor(tablero)
         DibujarTablero(tablero)
         dibujarMenu("menujuego",  opciones, "horizontal", 100, 20, 20, 420, 20, 480, 100)
-        ventana.blit(imagenLeyenda, (360, 180))
+        ventana.blit(pygame.image.load(direccion_imagenes + "cuadronombre.png"), (360, 124))
+        ventana.blit(imagenLeyenda, (360, 190))
+        rectangulo = pygame.Rect(381, 143, 186, 24)
+        pygame.display.update()
+        pygame.draw.rect(ventana, (0, 0, 0), rectangulo)
+        texto = fuente.render(nombre_jugador, 1, (255, 120, 255))
+        ventana.blit(texto, (385,145))
         pygame.display.update()
         if perdedor:
             MostrarMensaje(imagenDerrota, 130, 100, 5)
@@ -826,7 +837,7 @@ def MostrarTutorial():
     ventana.blit(imagenTitulo, (150, 20))
     ventana.blit(imagenTutorial, (100, 200))
     pygame.display.update()
-    time.sleep(0)
+    time.sleep(8)
     #Postcondicion: True
 
 pygame.init()
