@@ -418,8 +418,8 @@ def controlador_juego(tablero, dificultad):
         if opcion not in opciones_validas:
             MostrarMensaje(imagenOpcioninvalida, 100,200, 1.5)
         if opcion == "4":
-            salir = TerminarPartida(tablero, dificultad)
             contar_tiempo = False
+            salir = TerminarPartida(tablero, dificultad)
         if opcion == "5":
             MostrarMensaje(imagenEnConstruccion, 80,200,1.5)
         if opcion == "2":
@@ -480,8 +480,7 @@ def SeleccionarNivel():
         dibujarMenu("seleccionarnivel", ["facil", "dificil", "muydificil", "entrenamiento", "volver"], "vertical",
                     100, 30, 200, 150, 150, 450, 200)
         pygame.display.update()
-        #opcion = Leer(415, 465, color_lectura, 1, 440, 486)
-        opcion = "1"
+        opcion = Leer(415, 465, color_lectura, 1, 440, 486)
         if opcion == "5":
             break
         elif opcion == "1" or opcion == "2":
@@ -542,7 +541,7 @@ def validarString(string,menu) -> bool:
                 elif substring[0] == "C":
                     contador_caballos += 1
         if menu == "Introducir Nivel":
-            assert(contador_rey == 1 and  contador_reina <= 1 and contador_alfiles <= 2 and  contador_caballos <= 2 and
+            assert(contador_rey <= 1 and  contador_reina <= 1 and contador_alfiles <= 2 and  contador_caballos <= 2 and
                contador_torres <= 2 and contador_peones <= 2 and len(lista)>=2)
             return True
         elif menu == "Introducir Casilla":
@@ -684,7 +683,7 @@ def PosicionesValidasAlfil(xorigen, yorigen, tablero, espeon):
     posiciones_validas = []
     if espeon:
         distanciamaxima = xorigen+2
-        distanciamaxima2 = xorigen-2
+        distanciamaxima2 = xorigen-1
     else:
         distanciamaxima = 4
         distanciamaxima2 = 0
@@ -742,8 +741,7 @@ def IntroducirNivel():
         ventana.blit(imagenNivel, (100, 40))
         ventana.blit(pygame.image.load(direccion_imagenes + "maximo10fichas.png"), (120, 260))
         pygame.display.update()
-        #nivel = Leer(23, 407, color_lectura, 40, 580,431)
-        nivel = "Ca1-b2-Rc3-Dd4"
+        nivel = Leer(23, 407, color_lectura, 40, 580,431)
         #postcondicion nivel no es vacio
         try:
             assert(len(nivel) > 0)
@@ -789,19 +787,18 @@ def MenuPrincipal():
         dibujarMenu("menuprincipal", ["partidanueva", "cargarpartida", "mostrarrecords", "salirjuego"], "vertical",
                     100, 180, 200, 300, 150, 540, 200)
         pygame.display.update()
-        #opcion = Leer(415,555, color_lectura,1,440,575)
-        opcion = "1"
+        opcion = Leer(415,555, color_lectura,1,440,575)
         if opcion == "1":
             SeleccionarNivel()
         elif opcion == "2":
             MostrarMensaje(imagenEnConstruccion, 80, 200, 2)
         elif opcion == "3":
-            MostrarMensaje(imagenEnConstruccion, 800, 200, 2)
+            MostrarMensaje(imagenEnConstruccion, 80, 200, 2)
         elif opcion == "4":
             ConfirmacionSalida()
         else:
             MostrarMensaje(imagenOpcioninvalida, 100,300, 1.5)
-        # post condicion true
+        #postcondicion: true
 
 def FormatearFicha(imagen):
     return pygame.transform.scale(imagen, (50,90))
@@ -891,6 +888,6 @@ cambio_x = 70 #valor original 76
 y_fichas = 250
 cambio_y = 41 #valor original 50
 
-#MostrarTutorial()
-#nombre_jugador = IntroducirNombre()
+MostrarTutorial()
+nombre_jugador = IntroducirNombre()
 MenuPrincipal()
