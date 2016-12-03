@@ -12,6 +12,23 @@ def cerrar():
     # postcondicion true
 
 
+def dibujarCronometro():
+    ventana.blit(imagenFondoCronometro, (360,340))
+    numeros = ["Cero","Uno", "Dos", "Tres", "Cuatro", "Cinco", "Seis", "Siete", "Ocho", "Nueve"]
+    global tiempo_actual
+    segundos = tiempo_actual%60
+    string_segundos = str(segundos)
+    if segundos < 10:
+        string_segundos = "0" + str(segundos)
+    string_del_tiempo = str(int(tiempo_actual/60)) + ":" + string_segundos
+    for caracter in range(len(string_del_tiempo)):
+        if string_del_tiempo[caracter] != ":":
+            eval("ventana.blit(imagen" + numeros[int(string_del_tiempo[caracter])] + ", (370 + caracter*25,345))" )
+        else:
+            ventana.blit(imagenDospuntos, (366 + caracter*40,345))
+    pygame.display.update()
+
+
 #funcion que detecta eventos y evalua si son teclas
 #y retorna la entrada del usuario
 def Leer(x,y, color, longitud_maxima, xfinal, yfinal):
@@ -25,7 +42,6 @@ def Leer(x,y, color, longitud_maxima, xfinal, yfinal):
     patron = re.compile("^\w{1}$")
     patron2 = re.compile("\w")
     rectangulo = pygame.Rect(x, y, xfinal - x, yfinal - y)
-    texto = ""
     global shift
     global bloq_mayus
     global tiempo_maximo
@@ -39,6 +55,7 @@ def Leer(x,y, color, longitud_maxima, xfinal, yfinal):
         global tiempo_viejo
         global tiempo
         if contar_tiempo and int(tiempo_viejo) < pygame.time.get_ticks()/1000:
+            dibujarCronometro()
             tiempo_viejo += 1
             tiempo += 1
             tiempo_actual = tiempo_maximo - tiempo
@@ -374,7 +391,7 @@ def controlador_juego(tablero, dificultad):
     global contar_tiempo
     contar_tiempo = True
     if dificultad == 1:
-        tiempo_maximo = 5
+        tiempo_maximo = 180
     elif dificultad == 2:
         tiempo_maximo = 90
     global tiempo
@@ -410,9 +427,9 @@ def controlador_juego(tablero, dificultad):
             MostrarMensaje(imagenDeshacerJugada, 80, 200, 1.5)
         if opcion == "1":
             DibujarInterfaz(tablero,titulo_menu)
-            ventana.blit(imagenIntroducirCasillas,(200,400))
+            ventana.blit(imagenIntroducirCasillas,(200,410))
             pygame.display.update()
-            casilla_inicial = Leer(354, 436, (color_lectura), 2, 354+33, 436+20)
+            casilla_inicial = Leer(354, 446, (color_lectura), 2, 354+33, 446+20)
             valida = True
             if validarString(casilla_inicial, "Introducir Casilla"):
                 casilla_inicialx=ord(casilla_inicial[0])-97
@@ -424,7 +441,7 @@ def controlador_juego(tablero, dificultad):
                 valida = False
                 MostrarMensaje(imagenJugadaInvalida, 80, 200, 1.5)
             if valida:
-                casilla_final = Leer(354, 470, (color_lectura), 2, 354+34, 470+21)
+                casilla_final = Leer(354, 480, (color_lectura), 2, 354+34, 480+21)
                 if validarString(casilla_final, "Introducir Casilla"):
                     casilla_finalx=ord(casilla_final[0])-97
                     casilla_finaly=int(casilla_final[1])-1
@@ -463,8 +480,8 @@ def SeleccionarNivel():
         dibujarMenu("seleccionarnivel", ["facil", "dificil", "muydificil", "entrenamiento", "volver"], "vertical",
                     100, 30, 200, 150, 150, 450, 200)
         pygame.display.update()
-        opcion = Leer(415, 465, color_lectura, 1, 440, 486)
-        #opcion = "1"
+        #opcion = Leer(415, 465, color_lectura, 1, 440, 486)
+        opcion = "1"
         if opcion == "5":
             break
         elif opcion == "1" or opcion == "2":
@@ -606,11 +623,10 @@ def MoverFicha(fila, columna, filafinal, columnafinal, tablero, ficha):
         y_actual = (yf - y) * i + y
         DibujarInterfaz(tablero,titulo_menu)
         DibujarFicha(ficha, x_actual, y_actual)
-        pygame.display.update()
+        dibujarCronometro()
         if int(tiempo_viejo) < pygame.time.get_ticks()/1000:
             error_de_tiempo += 1
             tiempo_viejo += 1
-            print("corrigiendo error de tiempo")
     # postcondicion True
 
 
@@ -773,8 +789,8 @@ def MenuPrincipal():
         dibujarMenu("menuprincipal", ["partidanueva", "cargarpartida", "mostrarrecords", "salirjuego"], "vertical",
                     100, 180, 200, 300, 150, 540, 200)
         pygame.display.update()
-        opcion = Leer(415,555, color_lectura,1,440,575)
-        #opcion = "1"
+        #opcion = Leer(415,555, color_lectura,1,440,575)
+        opcion = "1"
         if opcion == "1":
             SeleccionarNivel()
         elif opcion == "2":
@@ -857,6 +873,7 @@ imagenNueve = pygame.image.load(direccion_imagenes_numeros + "nueve.png")
 imagenCero = pygame.image.load(direccion_imagenes_numeros + "cero.png")
 imagenDospuntos = pygame.image.load(direccion_imagenes_numeros + "dospuntos.png")
 imagenNombre = pygame.image.load(direccion_imagenes + "introducirnombre.png")
+imagenFondoCronometro = pygame.image.load(direccion_imagenes + "fondocronometro.png")
 fuente = pygame.font.Font(None, 28)
 
 #variables para controlar el tiempo
@@ -875,5 +892,5 @@ y_fichas = 250
 cambio_y = 41 #valor original 50
 
 #MostrarTutorial()
-nombre_jugador = IntroducirNombre()
+#nombre_jugador = IntroducirNombre()
 MenuPrincipal()
