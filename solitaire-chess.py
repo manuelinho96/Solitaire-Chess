@@ -391,7 +391,7 @@ def GuardarPartida(tablero, dificultad):
 
 
 #Funcion que dado un string carga una partida.
-def parsearPartidaGuardada():
+def parsearPartidaGuardada(partida):
     #Precondicion: True
     partida_lista = partida.split(" ")
     resultado = []
@@ -413,18 +413,43 @@ def parsearPartidaGuardada():
 def MenuCargar():
     #Precondicion: True
     opciones = ["anteriores", "seleccionar", "siguientes", "volver"]
-    while True:
+    partidas_cargadas = LeerArchivo("partidasguardadas")
+    contador = 0
+    while contador <= len(partidas_cargadas):
+        #Cota: len(partidas_cargadas) - contador
+        partida_seleccionada = parsearPartidaGuardada(partidas_cargadas[contador])
+        numero_partida = fuente_prueba.render("Partida: " + str(contador + 1), 1, (255, 120, 255))
+        tiempo_partida = fuente_prueba.render("Tiempo: " + str(partida_seleccionada[0]), 1, (255, 120, 255))
+        if partida_seleccionada[1] == 2:
+            string_dificultad = "dificil"
+        if partida_seleccionada[1] == 1:
+            string_dificultad = "facil"
+        if partida_seleccionada[1] == 3:
+            string_dificultad = "muy dificil"
+        if partida_seleccionada[1] == 4:
+            string_dificultad = "entrenamiento"
+        dificultad_partida = fuente_prueba.render("dificultad: " + string_dificultad, 1, (255, 120, 255))
         rectangulo = pygame.Rect(149, 176, 309, 205)
         ventana.blit(imagenFondo, (0, 0))
-        dibujarMenu("cargarpartidatitulo", opciones, "horizontal", 100, 20, 93, 440, 150, 500, 100)
+        dibujarMenu("cargarpartidatitulo", opciones, "horizontal", 100, 20, 30, 440, 150, 500, 130)
         ventana.blit(imagenPizarra, (100,140))
         pygame.draw.rect(ventana, (0, 0, 0), rectangulo)
-        #texto = fuente.render(string, 1, (255, 120, 255))
-        #ventana.blit(texto, (x + 7, y + 1))
+        ventana.blit(numero_partida, (152, 179))
+        ventana.blit(tiempo_partida, (346,179))
+        ventana.blit(dificultad_partida, (152,200))
+        DibujarTablero_miniatura(partida_seleccionada[2])
         pygame.display.update()
         opcion = Leer(416,514,color_lectura,1, 440, 534)
         if opcion == "5":
             break
+        elif opcion == "2" and (contador + 1) < len(partidas_cargadas):
+            contador += 1
+        elif opcion == "0" and (contador - 1) >= 0:
+            contador -= 1
+        elif opcion == "1":
+            controlador_juego(partida_seleccionada[2],partida_seleccionada[1],partida_seleccionada[0])
+        else:
+            MostrarMensaje(imagenOpcioninvalida, 100, 250, 1.5)
     #Postcondicion: True
 
 
@@ -669,7 +694,7 @@ def DibujarFicha(ficha, x, y):
     elif ficha == "P":
         ventana.blit(imagenPeon, (x,y))
 
-
+#Funcion que dado un tablero lo dibuja en la interfaz grafica.
 def DibujarTablero(tablero):
     filas = len(tablero)
     columnas = len(tablero[0])
@@ -681,6 +706,18 @@ def DibujarTablero(tablero):
             pos_columna = columnas - 1 - columna
             DibujarFicha(tablero[fila][pos_columna], x_fichas + (fila * cambio_x), y_fichas - (pos_columna * cambio_y))
 
+
+#Funcion que dado un tablero dibuja su version en miniatura.
+def DibujarTablero_miniatura(tablero):
+    filas = len(tablero)
+    columnas = len(tablero[0])
+    imagentablero =  pygame.transform.scale(pygame.image.load(direccion_imagenes + "tablero.png"), (310,150))
+    ventana.blit(imagentablero, (x_miniatura - 34, y_miniatura - 70))
+    for fila in range(filas):
+        for columna in range(columnas):
+            # se trabaja con la posicion columnas - columna para que se dubijen de arriba a abajo
+            pos_columna = columnas - 1 - columna
+            DibujarFicha(tablero[fila][pos_columna], x_miniatura + (fila * cambiomin_x), y_miniatura - (pos_columna * cambiomin_y))
 
 # funcion que controla la animacion de mover una ficha de una casilla a otra, controlado en pixeles
 def MoverFicha(fila, columna, filafinal, columnafinal, tablero, ficha):
@@ -961,6 +998,7 @@ imagenPausa =  pygame.image.load(direccion_imagenes + "juegopausado.png")
 imagenContinuar = pygame.image.load(direccion_imagenes + "continuar.png")
 imagenPizarra = pygame.transform.scale(pygame.image.load(direccion_imagenes + "pizarra.png"), (400,280))
 fuente = pygame.font.Font(None, 28)
+fuente_prueba = pygame.font.Font(None, 22)
 
 #variables para controlar el tiempo
 contar_tiempo = False
@@ -976,6 +1014,11 @@ cambio_x = 70 #valor original 76
 y_fichas = 250
 cambio_y = 41 #valor original 50
 
+##Valores para el tablero miniatura
+x_miniatura = 183
+y_miniatura = 294
+cambiomin_x = 70
+cambiomin_y = 41
 #MostrarTutorial()
 nombre_jugador = "jose"
 #nombre_jugador = IntroducirNombre()
