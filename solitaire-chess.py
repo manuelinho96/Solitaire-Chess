@@ -1,4 +1,5 @@
 import pygame, sys, re, time, copy
+import datetime
 from pygame.locals import *
 
 shift = False #variable booleana que indica el estado de la tecla shift
@@ -11,7 +12,7 @@ def cerrar():
     sys.exit()
     # postcondicion true
 
-
+#Funcion que muestra el cronometro de la partida.
 def dibujarCronometro():
     ventana.blit(imagenFondoCronometro, (360,340))
     numeros = ["Cero","Uno", "Dos", "Tres", "Cuatro", "Cinco", "Seis", "Siete", "Ocho", "Nueve"]
@@ -61,6 +62,8 @@ def Leer(x,y, color, longitud_maxima, xfinal, yfinal):
             tiempo_actual = tiempo_maximo - tiempo
             if tiempo_actual <= -1:
                 return "perdida_por_tiempo"
+        elif not contar_tiempo and int(tiempo_viejo) < pygame.time.get_ticks()/1000:
+            tiempo_viejo += 1
         for event in pygame.event.get():
             if event.type == QUIT:
                     cerrar()
@@ -251,6 +254,25 @@ def BusquedaHorizontal(x_inicial, x_final, y, direccion, tablero):
     return resultado
 
 
+#Funcion que se encarga de pausar el juego cuando el usuario asi lo desee.
+def pausar_juego():
+    #Precondicion: True
+    global tiempo_viejo
+    global contar_tiempo
+    contar_tiempo = False
+    ventana.blit(imagenFondo,(0,0))
+    dibujarMenu("juegopausado", ["continuar"], "vertical", 100, 20, 238, 270, 142, 480, 100)
+    pygame.display.update()
+    while True:
+        opcion = Leer(408, 494, color_lectura, 1, 432, 515)
+        if opcion == "1":
+            contar_tiempo = True
+            break
+        else:
+            print("opcion invalida")
+    #Postcondicion: True
+
+
 #Funcion que redibuja la interfaz
 def DibujarInterfaz(tablero,titulomenu):
     #Precondicion: True
@@ -330,16 +352,24 @@ def StringDeTablero(tablero):
                     string += "-"
     return string
 
-
+#Funcion que escribe informacion acerca de una partida guardada
 def EscribirEnArchivo(string):
     with open("sources/files/partidasguardadas.txt", "a") as archivoSalida:
         archivoSalida.write(string)
+
+#Funcion que lee informacion de un archivo
+def LeerArchivo(nombre):
+    with open("sources/files/" + nombre + ".txt", "r") as archivoEntrada:
+        lineas = archivoEntrada.readlines()
+    return lineas
 
 
 #Funcion que muestra menu de guardar partida y ejecuta esta accion en caso de que el usuario asi lo desee
 def GuardarPartida(tablero, dificultad):
     #Precondicion: True
     dificultades = ["facil", "dificil"]
+    global tiempo_actual
+    fecha_actual = datetime.datetime.now()
     while True:
         ventana.blit(imagenFondo, (0, 0))
         dibujarMenu("GuardarPartida", ["si", "no"], "horizontal", 100, 50, 112, 279, 138, 464, 200)
@@ -347,14 +377,56 @@ def GuardarPartida(tablero, dificultad):
         opcion = Leer(403, 479, color_lectura, 1, 428, 500)
         if opcion == "1":
             partida_string =  StringDeTablero(tablero)
-            string = "Partida N FECHA TIEMPO" + dificultades[dificultad] + " " + partida_string + "" +nombre_jugador +"\n"
+            partidas_guardadas = LeerArchivo("partidasguardadas")
+            string = "Partida:" + str(len(partidas_guardadas) + 1) + " FECHA:" + str(fecha_actual.day) \
+            + str(fecha_actual.month) + str(fecha_actual.year) + " " + "TIEMPO:" + str(tiempo_actual) + " " \
+            + dificultades[dificultad-1] + " " + partida_string + " " + nombre_jugador +"\n"
             EscribirEnArchivo(string)
             break
         elif opcion == "2":
             break
         else:
             MostrarMensaje(imagenOpcioninvalida, 100, 250, 1.5)
-    #Postcondicion:
+    #Postcondicion: True
+
+
+#Funcion que dado un string carga una partida.
+def parsearPartidaGuardada():
+    #Precondicion: True
+    partida_lista = partida.split(" ")
+    resultado = []
+    tiempo = int(partida_lista[2].split(":")[1])
+    resultado.append(tiempo)
+    if partida_lista[3] == "dificil":
+        resultado.append(2)
+    if partida_lista[3] == "facil":
+        resultado.append(1)
+    if partida_lista[3] == "muy_dificil":
+        resultado.append(3)
+    if partida_lista[3] == "entrenamiento":
+        resultado.append(4)
+    resultado.append(MatrizDeString(partida_lista[4]))
+    return resultado
+    #Postcondicion: True
+
+#Funcion que dibuja el menu de cargar partida
+def MenuCargar():
+    #Precondicion: True
+    opciones = ["anteriores", "seleccionar", "siguientes", "volver"]
+    while True:
+        rectangulo = pygame.Rect(149, 176, 309, 205)
+        ventana.blit(imagenFondo, (0, 0))
+        dibujarMenu("cargarpartidatitulo", opciones, "horizontal", 100, 20, 93, 440, 150, 500, 100)
+        ventana.blit(imagenPizarra, (100,140))
+        pygame.draw.rect(ventana, (0, 0, 0), rectangulo)
+        #texto = fuente.render(string, 1, (255, 120, 255))
+        #ventana.blit(texto, (x + 7, y + 1))
+        pygame.display.update()
+        opcion = Leer(416,514,color_lectura,1, 440, 534)
+        if opcion == "5":
+            break
+    #Postcondicion: True
+
 
 
 #Funcion que muestra el menu de terminar una partida
@@ -376,7 +448,7 @@ def TerminarPartida(tablero, dificultad):
     #Postcondicion: True
 
 
-def controlador_juego(tablero, dificultad):
+def controlador_juego(tablero, dificultad,tiempoinicial):
     titulo_menu = pygame.transform.scale(pygame.image.load("sources/sprites/menujuego.png"), (400, 100))
     opciones_validas = ["1", "3", "4"]
     opciones = ["jugar"]
@@ -400,7 +472,7 @@ def controlador_juego(tablero, dificultad):
     elif dificultad == 2:
         tiempo_maximo = 90
     global tiempo
-    tiempo = 0
+    tiempo = tiempo_maximo - tiempoinicial
     global tiempo_viejo
     tiempo_viejo = pygame.time.get_ticks() / 1000
     global tiempo_actual
@@ -433,6 +505,8 @@ def controlador_juego(tablero, dificultad):
             salir = TerminarPartida(tablero, dificultad)
         if opcion == "5":
             MostrarMensaje(imagenEnConstruccion, 80,200,1.5)
+        if opcion == "3":
+            pausar_juego()
         if opcion == "2":
             tablero = tableroviejo
             MostrarMensaje(imagenDeshacerJugada, 80, 200, 1.5)
@@ -491,18 +565,20 @@ def SeleccionarNivel():
         dibujarMenu("seleccionarnivel", ["facil", "dificil", "muydificil", "entrenamiento", "volver"], "vertical",
                     100, 30, 200, 150, 150, 450, 200)
         pygame.display.update()
-        opcion = Leer(415, 465, color_lectura, 1, 440, 486)
+        opcion = "2"
+        #opcion = Leer(415, 465, color_lectura, 1, 440, 486)
         if opcion == "5":
             break
         elif opcion == "1" or opcion == "2":
             nivel_valido = False
             while nivel_valido == False:
-                nivel = IntroducirNivel()
+                nivel = "Ta1-a2"
+                #nivel = IntroducirNivel()
                 nivel_valido = validarString(nivel,"Introducir Nivel")
                 if nivel_valido == False:
-                    MostrarMensaje(imagenTableroInvalido, 100, 200, 1.5)
+                    MostrarMensaje(imagenTableroInvalido, 50, 200, 1.5)
             tablero = MatrizDeString(nivel)
-            controlador_juego(tablero, int(opcion))
+            controlador_juego(tablero, int(opcion), 0)
         elif opcion == "3" or opcion == "4":
             MostrarMensaje(imagenEnConstruccion, 100,200, 1.5)
         else:
@@ -612,7 +688,6 @@ def MoverFicha(fila, columna, filafinal, columnafinal, tablero, ficha):
     tiempo_inicio = pygame.time.get_ticks()
     tablero[fila][columna] = ""
     # precondicion x,y,xf,yf deben estar entre 0 y 600
-    global error_de_tiempo
     global tiempo_viejo
     x = x_fichas + (fila * cambio_x)
     y = y_fichas - (columna * cambio_y)
@@ -635,7 +710,6 @@ def MoverFicha(fila, columna, filafinal, columnafinal, tablero, ficha):
         DibujarFicha(ficha, x_actual, y_actual)
         dibujarCronometro()
         if int(tiempo_viejo) < pygame.time.get_ticks()/1000:
-            error_de_tiempo += 1
             tiempo_viejo += 1
     # postcondicion True
 
@@ -798,11 +872,12 @@ def MenuPrincipal():
         dibujarMenu("menuprincipal", ["partidanueva", "cargarpartida", "mostrarrecords", "salirjuego"], "vertical",
                     100, 180, 200, 300, 150, 540, 200)
         pygame.display.update()
+        #opcion = "2"
         opcion = Leer(415,555, color_lectura,1,440,575)
         if opcion == "1":
             SeleccionarNivel()
         elif opcion == "2":
-            MostrarMensaje(imagenEnConstruccion, 80, 200, 2)
+            MenuCargar()
         elif opcion == "3":
             MostrarMensaje(imagenEnConstruccion, 80, 200, 2)
         elif opcion == "4":
@@ -882,6 +957,9 @@ imagenCero = pygame.image.load(direccion_imagenes_numeros + "cero.png")
 imagenDospuntos = pygame.image.load(direccion_imagenes_numeros + "dospuntos.png")
 imagenNombre = pygame.image.load(direccion_imagenes + "introducirnombre.png")
 imagenFondoCronometro = pygame.image.load(direccion_imagenes + "fondocronometro.png")
+imagenPausa =  pygame.image.load(direccion_imagenes + "juegopausado.png")
+imagenContinuar = pygame.image.load(direccion_imagenes + "continuar.png")
+imagenPizarra = pygame.transform.scale(pygame.image.load(direccion_imagenes + "pizarra.png"), (400,280))
 fuente = pygame.font.Font(None, 28)
 
 #variables para controlar el tiempo
@@ -890,7 +968,6 @@ tiempo_viejo = pygame.time.get_ticks()/1000
 tiempo_actual = 0
 tiempo = 0
 tiempo_maximo = 0
-error_de_tiempo = 0 # no se debe contar el tiempo mientras el usuario no puede introducir informacion
 
 ######cambiar los valores de estas variables
 #####para mover el tablero en la pantalla
@@ -899,6 +976,7 @@ cambio_x = 70 #valor original 76
 y_fichas = 250
 cambio_y = 41 #valor original 50
 
-MostrarTutorial()
-nombre_jugador = IntroducirNombre()
+#MostrarTutorial()
+nombre_jugador = "jose"
+#nombre_jugador = IntroducirNombre()
 MenuPrincipal()
