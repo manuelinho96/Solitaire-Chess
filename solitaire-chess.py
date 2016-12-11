@@ -406,6 +406,8 @@ def parsearPartidaGuardada(partida):
     if partida_lista[3] == "entrenamiento":
         resultado.append(4)
     resultado.append(MatrizDeString(partida_lista[4]))
+    resultado.append(partida_lista[1].split(":")[1])
+    resultado.append(partida_lista[0].split(":")[1])
     return resultado
     #Postcondicion: True
 
@@ -424,8 +426,9 @@ def MenuCargar():
             opciones.append("siguientes")
         opciones.append("volver")
         partida_seleccionada = parsearPartidaGuardada(partidas_cargadas[contador])
-        numero_partida = fuente_prueba.render("Partida: " + str(contador + 1), 1, (255, 120, 255))
+        numero_partida = fuente_prueba.render("Partida: " + partida_seleccionada[4], 1, (255, 120, 255))
         tiempo_partida = fuente_prueba.render("Tiempo: " + str(partida_seleccionada[0]), 1, (255, 120, 255))
+        fecha_partida = fuente_prueba.render("Fecha: " + str(partida_seleccionada[3]), 1, (255, 120, 255))
         if partida_seleccionada[1] == 2:
             string_dificultad = "dificil"
         if partida_seleccionada[1] == 1:
@@ -441,8 +444,9 @@ def MenuCargar():
         ventana.blit(imagenPizarra, (100,140))
         pygame.draw.rect(ventana, (0, 0, 0), rectangulo)
         ventana.blit(numero_partida, (152, 179))
-        ventana.blit(tiempo_partida, (346,179))
+        ventana.blit(tiempo_partida, (300,179))
         ventana.blit(dificultad_partida, (152,200))
+        ventana.blit(fecha_partida, (300, 200))
         DibujarTablero_miniatura(partida_seleccionada[2])
         pygame.display.update()
         opcion = Leer(416,514,color_lectura,1, 440, 534)
@@ -1038,6 +1042,6 @@ y_miniatura = 294
 cambiomin_x = 70
 cambiomin_y = 41
 #MostrarTutorial()
-nombre_jugador = "jose"
+nombre_jugador = "joseesloco"
 #nombre_jugador = IntroducirNombre()
 MenuPrincipal()
