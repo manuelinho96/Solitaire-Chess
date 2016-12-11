@@ -1,0 +1,4 @@
+pedro:3
+maria:2
+carlos:2
+pedrito:4

@@ -1,0 +1,3 @@
+pedro:0
+maria:7
+carlos:8
