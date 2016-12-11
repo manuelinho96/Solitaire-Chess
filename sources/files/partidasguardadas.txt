@@ -2,3 +2,8 @@ Partida:1 FECHA:9/12/2016 TIEMPO:87 dificil Ta1-a2 jose
 Partida:2 FECHA:9/12/2016 TIEMPO:87 dificil Ta1-a2-Rc4 jose
 Partida:3 FECHA:9/12/2016 TIEMPO:87 dificil Ta1-a2 jose
 Partida:4 FECHA:10/12/2016 TIEMPO:85 dificil Ta1-a2 jose
+Partida:5 FECHA:11/12/2016 TIEMPO:178 facil Ta1-a2 joseesloco
+Partida:6 FECHA:11/12/2016 TIEMPO:178 facil Ta1-a2 joseesloco
+Partida:7 FECHA:11/12/2016 TIEMPO:178 facil Ta1-a2 joseesloco
+Partida:8 FECHA:11/12/2016 TIEMPO:999 muy_dificil Ta1-a2 joseesloco victorias:2
+Partida:10 FECHA:11/12/2016 TIEMPO:997 muy_dificil Ta1-a2 joseesloco victorias:2

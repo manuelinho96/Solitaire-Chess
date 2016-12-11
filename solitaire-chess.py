@@ -370,20 +370,24 @@ def LeerArchivo(nombre):
 #Funcion que muestra menu de guardar partida y ejecuta esta accion en caso de que el usuario asi lo desee
 def GuardarPartida(tablero, dificultad):
     #Precondicion: True
-    dificultades = ["facil", "dificil"]
+    dificultades = ["facil", "dificil", "muy_dificil", "entrenamiento"]
     global tiempo_actual
     fecha_actual = datetime.datetime.now()
     while True:
         ventana.blit(imagenFondo, (0, 0))
         dibujarMenu("GuardarPartida", ["si", "no"], "horizontal", 100, 50, 112, 279, 138, 464, 200)
         pygame.display.update()
+        global partidas_ganadas
         opcion = Leer(403, 479, color_lectura, 1, 428, 500)
         if opcion == "1":
             partida_string =  StringDeTablero(tablero)
             partidas_guardadas = LeerArchivo("partidasguardadas")
-            string = "Partida:" + str(len(partidas_guardadas) + 1) + " FECHA:" + str(fecha_actual.day) + "/" + \
-            + "/" +str(fecha_actual.month) + "/" +str(fecha_actual.year) + " " + "TIEMPO:" + str(tiempo_actual) + " " \
-            + dificultades[dificultad-1] + " " + partida_string + " " + nombre_jugador +"\n"
+            string = "Partida:" + str(len(partidas_guardadas) + 1) + " FECHA:" + str(fecha_actual.day) + "/" +\
+                str(fecha_actual.month) + "/" + str(fecha_actual.year) + " " + "TIEMPO:" + str(tiempo_actual) +\
+                " " + dificultades[dificultad - 1] + " " + partida_string + " " + nombre_jugador
+            if dificultad == 3:
+                string += "victorias:" + str(partidas_ganadas)
+            string += "\n"
             EscribirEnArchivo(string)
             break
         elif opcion == "2":
@@ -411,6 +415,9 @@ def parsearPartidaGuardada(partida):
     resultado.append(MatrizDeString(partida_lista[4]))
     resultado.append(partida_lista[1].split(":")[1])
     resultado.append(partida_lista[0].split(":")[1])
+    resultado.append(partida_lista[5])
+    if partida_lista[3] == "muy_dificil":
+        resultado.append(partida_lista[6].split(":")[1])
     return resultado
     #Postcondicion: True
 
@@ -430,37 +437,52 @@ def MenuCargar():
         opciones.append("volver")
         partida_seleccionada = parsearPartidaGuardada(partidas_cargadas[contador])
         numero_partida = fuente_prueba.render("Partida: " + partida_seleccionada[4], 1, (255, 120, 255))
-        tiempo_partida = fuente_prueba.render("Tiempo: " + str(partida_seleccionada[0]), 1, (255, 120, 255))
+        tiempo_partida = fuente_prueba.render("Tiempo restante: " + str(partida_seleccionada[0]), 1, (255, 120, 255))
         fecha_partida = fuente_prueba.render("Fecha: " + str(partida_seleccionada[3]), 1, (255, 120, 255))
+        jugador_partida = fuente_prueba.render("Jugador: " + partida_seleccionada[5], 1, (255, 120, 255))
         if partida_seleccionada[1] == 2:
             string_dificultad = "dificil"
         if partida_seleccionada[1] == 1:
             string_dificultad = "facil"
         if partida_seleccionada[1] == 3:
             string_dificultad = "muy dificil"
+            global partidas_ganadas
+            partidas_ganadas = int(partida_seleccionada[6])
+            ganadas_partida = fuente_prueba.render("Victorias: " + str(partidas_ganadas) + "/3", 1, (255,120,255))
         if partida_seleccionada[1] == 4:
             string_dificultad = "entrenamiento"
-        dificultad_partida = fuente_prueba.render("dificultad: " + string_dificultad, 1, (255, 120, 255))
+        dificultad_partida = fuente_prueba.render("Dificultad: " + string_dificultad, 1, (255, 120, 255))
         rectangulo = pygame.Rect(149, 176, 309, 205)
         ventana.blit(imagenFondo, (0, 0))
         dibujarMenu("cargarpartidatitulo", opciones, "horizontal", 100, 20, 30, 440, 150, 500, 130)
         ventana.blit(imagenPizarra, (100,140))
         pygame.draw.rect(ventana, (0, 0, 0), rectangulo)
         ventana.blit(numero_partida, (152, 179))
-        ventana.blit(tiempo_partida, (300,179))
-        ventana.blit(dificultad_partida, (152,200))
-        ventana.blit(fecha_partida, (300, 200))
+        ventana.blit(tiempo_partida, (320,179))
+        ventana.blit(dificultad_partida, (152, 195))
+        ventana.blit(fecha_partida, (320, 195))
+        ventana.blit(jugador_partida, (320, 210))
+        if partida_seleccionada[1] == 3:
+            ventana.blit(ganadas_partida, (152, 210))
         DibujarTablero_miniatura(partida_seleccionada[2])
         pygame.display.update()
         opcion = Leer(416,514,color_lectura,1, 440, 534)
         if opcion == "5":
             break
-        elif opcion == "2" and (contador + 1) < len(partidas_cargadas):
+        elif opcion == "2" and contador < len(partidas_cargadas) - 1 :
             contador += 1
         elif opcion == "0" and (contador - 1) >= 0:
             contador -= 1
         elif opcion == "1":
-            controlador_juego(partida_seleccionada[2],partida_seleccionada[1],partida_seleccionada[0])
+            if partida_seleccionada[1] == 1:
+                tiempo_final = 180
+            elif partida_seleccionada[1] == 2:
+                tiempo_final = 90
+            elif partida_seleccionada[1] == 3:
+                tiempo_final = 120
+            elif partida_seleccionada[1] == 4:
+                tiempo_final = 2
+            controlador_juego(partida_seleccionada[2],partida_seleccionada[1],partida_seleccionada[0], tiempo_final)
         else:
             MostrarMensaje(imagenOpcioninvalida, 100, 250, 1.5)
     #Postcondicion: True
@@ -478,8 +500,7 @@ def TerminarPartida(tablero, dificultad):
         contar_tiempo = False
         opcion = Leer(403, 479, color_lectura, 1, 428, 500)
         if opcion == "1":
-            if dificultad >= 1 and dificultad <= 2:
-                GuardarPartida(tablero, dificultad)
+            GuardarPartida(tablero, dificultad)
             return True
         elif opcion == "2":
             contar_tiempo = True
@@ -630,7 +651,7 @@ def SeleccionarNivel():
             if opcion != "3":
                 while True:
                     ventana.blit(imagenFondo, (0, 0))
-                    dibujarMenu("metododeentrada", ["teclado", "cartadesafio","volver"], "vertical", 100, 30, 200, 200, 150, 450, 200)
+                    #dibujarMenu("metododeentrada", ["teclado", "cartadesafio","volver"], "vertical", 100, 30, 200, 200, 150, 450, 200)
                     opcion_entrada = Leer(415, 465, color_lectura, 1, 440, 486)
                     pygame.display.update()
                     if opcion_entrada != "1" and opcion_entrada != "2" and opcion_entrada != "5":
@@ -1084,7 +1105,7 @@ imagenPausa =  pygame.image.load(direccion_imagenes + "juegopausado.png")
 imagenContinuar = pygame.image.load(direccion_imagenes + "continuar.png")
 imagenPizarra = pygame.transform.scale(pygame.image.load(direccion_imagenes + "pizarra.png"), (400,280))
 fuente = pygame.font.Font(None, 28)
-fuente_prueba = pygame.font.Font(None, 22)
+fuente_prueba = pygame.font.Font(None, 18)
 
 #variables para controlar el tiempo
 contar_tiempo = False
