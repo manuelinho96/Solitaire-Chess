@@ -1,4 +1,4 @@
-Partida:1 FECHA:9122016 TIEMPO:87 dificil Ta1-a2 jose
-Partida:2 FECHA:9122016 TIEMPO:87 dificil Ta1-a2-Rc4 jose
-Partida:3 FECHA:9122016 TIEMPO:87 dificil Ta1-a2 jose
-Partida:4 FECHA:10122016 TIEMPO:85 dificil Ta1-a2 jose
+Partida:1 FECHA:9/12/2016 TIEMPO:87 dificil Ta1-a2 jose
+Partida:2 FECHA:9/12/2016 TIEMPO:87 dificil Ta1-a2-Rc4 jose
+Partida:3 FECHA:9/12/2016 TIEMPO:87 dificil Ta1-a2 jose
+Partida:4 FECHA:10/12/2016 TIEMPO:85 dificil Ta1-a2 jose
