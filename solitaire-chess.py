@@ -804,6 +804,21 @@ def DibujarFicha(ficha, x, y):
     elif ficha == "P":
         ventana.blit(imagenPeon, (x,y))
 
+def DibujarFichamMiniatura(ficha, x, y):
+    if ficha == "R":
+        ventana.blit(imagenReymini, (x,y))
+    elif ficha == "D":
+        ventana.blit(imagenReinamini, (x,y))
+    elif ficha == "A":
+        ventana.blit(imagenAlfilmini, (x,y))
+    elif ficha == "C":
+        ventana.blit(imagenCaballomini, (x,y))
+    elif ficha == "T":
+        ventana.blit(imagenTorremini, (x,y))
+    elif ficha == "P":
+        ventana.blit(imagenPeonmini, (x,y))
+
+
 #Funcion que dado un tablero lo dibuja en la interfaz grafica.
 def DibujarTablero(tablero):
     filas = len(tablero)
@@ -822,12 +837,14 @@ def DibujarTablero_miniatura(tablero):
     filas = len(tablero)
     columnas = len(tablero[0])
     imagentablero =  pygame.transform.scale(pygame.image.load(direccion_imagenes + "tablero.png"), (310,150))
-    ventana.blit(imagentablero, (x_miniatura - 34, y_miniatura - 70))
+    ventana.blit(imagentablero, (x_miniatura - 40, y_miniatura - 84))
     for fila in range(filas):
         for columna in range(columnas):
-            # se trabaja con la posicion columnas - columna para que se dubijen de arriba a abajo
+            # se trabaja con la posicion columnas - columna para que se dibujen de arriba a abajo
             pos_columna = columnas - 1 - columna
-            DibujarFicha(tablero[fila][pos_columna], x_miniatura + (fila * cambiomin_x), y_miniatura - (pos_columna * cambiomin_y))
+            DibujarFichamMiniatura(tablero[fila][pos_columna], x_miniatura + (fila * cambiomin_x),
+                                   y_miniatura - (pos_columna * cambiomin_y))
+
 
 # funcion que controla la animacion de mover una ficha de una casilla a otra, controlado en pixeles
 def MoverFicha(fila, columna, filafinal, columnafinal, tablero, ficha):
@@ -1151,6 +1168,12 @@ imagenReina = FormatearFicha(pygame.image.load(direccion_imagenes + "reina.png")
 imagenCaballo = FormatearFicha(pygame.image.load(direccion_imagenes + "caballo.png"))
 imagenTorre = FormatearFicha(pygame.image.load(direccion_imagenes + "torre.png"))
 imagenPeon = FormatearFicha(pygame.image.load(direccion_imagenes + "peon.png"))
+imagenReymini = pygame.transform.scale(pygame.image.load(direccion_imagenes + "rey.png"), (40,40))
+imagenAlfilmini = pygame.transform.scale(pygame.image.load(direccion_imagenes + "alfil.png"), (40,40))
+imagenReinamini = pygame.transform.scale(pygame.image.load(direccion_imagenes + "reina.png"), (40,40))
+imagenCaballomini = pygame.transform.scale(pygame.image.load(direccion_imagenes + "caballo.png"), (40,40))
+imagenTorremini = pygame.transform.scale(pygame.image.load(direccion_imagenes + "torre.png"), (40,40))
+imagenPeonmini = pygame.transform.scale(pygame.image.load(direccion_imagenes + "peon.png"), (40,40))
 imagenOpcioninvalida = pygame.image.load(direccion_imagenes + "opcioninvalida.png")
 imagenEnConstruccion = pygame.image.load(direccion_imagenes + "enconstruccion.png")
 imagenTableroInvalido = pygame.image.load(direccion_imagenes + "tableroinvalido.png")
@@ -1197,10 +1220,10 @@ y_fichas = 250
 cambio_y = 41 #valor original 50
 
 ##Valores para el tablero miniatura
-x_miniatura = 183
-y_miniatura = 294
-cambiomin_x = 70
-cambiomin_y = 41
+x_miniatura = 187
+y_miniatura = 316
+cambiomin_x = 69
+cambiomin_y = 32
 #MostrarTutorial()
 nombre_jugador = "joseesloco"
 nombre_jugador = IntroducirNombre()
