@@ -378,8 +378,8 @@ def GuardarPartida(tablero, dificultad):
         if opcion == "1":
             partida_string =  StringDeTablero(tablero)
             partidas_guardadas = LeerArchivo("partidasguardadas")
-            string = "Partida:" + str(len(partidas_guardadas) + 1) + " FECHA:" + str(fecha_actual.day) \
-            + str(fecha_actual.month) + str(fecha_actual.year) + " " + "TIEMPO:" + str(tiempo_actual) + " " \
+            string = "Partida:" + str(len(partidas_guardadas) + 1) + " FECHA:" + str(fecha_actual.day) + "/" + \
+            + "/" +str(fecha_actual.month) + "/" +str(fecha_actual.year) + " " + "TIEMPO:" + str(tiempo_actual) + " " \
             + dificultades[dificultad-1] + " " + partida_string + " " + nombre_jugador +"\n"
             EscribirEnArchivo(string)
             break
@@ -412,11 +412,17 @@ def parsearPartidaGuardada(partida):
 #Funcion que dibuja el menu de cargar partida
 def MenuCargar():
     #Precondicion: True
-    opciones = ["anteriores", "seleccionar", "siguientes", "volver"]
     partidas_cargadas = LeerArchivo("partidasguardadas")
     contador = 0
     while contador <= len(partidas_cargadas):
         #Cota: len(partidas_cargadas) - contador
+        opciones = []
+        if contador > 0:
+            opciones.append("anteriores")
+        opciones.append("seleccionar")
+        if contador < len(partidas_cargadas) - 1:
+            opciones.append("siguientes")
+        opciones.append("volver")
         partida_seleccionada = parsearPartidaGuardada(partidas_cargadas[contador])
         numero_partida = fuente_prueba.render("Partida: " + str(contador + 1), 1, (255, 120, 255))
         tiempo_partida = fuente_prueba.render("Tiempo: " + str(partida_seleccionada[0]), 1, (255, 120, 255))
@@ -461,41 +467,49 @@ def TerminarPartida(tablero, dificultad):
         ventana.blit(imagenFondo, (0, 0))
         dibujarMenu("TerminarPartida", ["si", "no"], "horizontal", 100, 50, 112, 279, 138, 464, 200)
         pygame.display.update()
+        global contar_tiempo
+        contar_tiempo = False
         opcion = Leer(403, 479, color_lectura, 1, 428, 500)
         if opcion == "1":
             if dificultad >= 1 and dificultad <= 2:
                 GuardarPartida(tablero, dificultad)
             return True
         elif opcion == "2":
+            contar_tiempo = True
             break
         else:
             MostrarMensaje(imagenOpcioninvalida, 100, 250, 1.5)
     #Postcondicion: True
 
 
-def controlador_juego(tablero, dificultad,tiempoinicial):
+def controlador_juego(tablero, dificultad, tiempoinicial, tiempofinal):
     titulo_menu = pygame.transform.scale(pygame.image.load("sources/sprites/menujuego.png"), (400, 100))
-    opciones_validas = ["1", "3", "4"]
+    opciones_validas = ["1", "4"]
     opciones = ["jugar"]
     ganador = False
     perdedor = False
+    # configuraciones de dificultad
     if dificultad == 1 or dificultad == 4:
         opciones.append("deshacer")
         opciones_validas.append("2")
-    opciones.append("pausar")
+    if dificultad != 4:
+        opciones.append("pausar")
+        opciones_validas. append ("3")
     opciones.append("terminar")
     if dificultad == 4:
         opciones.append("solucionar")
         opciones_validas.append("5")
+
     tableroviejo = tablero
     salir = False
+
+    #configuraciones del tiempo
     global tiempo_maximo
     global contar_tiempo
     contar_tiempo = True
-    if dificultad == 1:
-        tiempo_maximo = 180
-    elif dificultad == 2:
-        tiempo_maximo = 90
+    if dificultad == 4:
+        contar_tiempo = False
+    tiempo_maximo = tiempofinal
     global tiempo
     tiempo = tiempo_maximo - tiempoinicial
     global tiempo_viejo
@@ -526,7 +540,6 @@ def controlador_juego(tablero, dificultad,tiempoinicial):
         if opcion not in opciones_validas:
             MostrarMensaje(imagenOpcioninvalida, 100,200, 1.5)
         if opcion == "4":
-            contar_tiempo = False
             salir = TerminarPartida(tablero, dificultad)
         if opcion == "5":
             MostrarMensaje(imagenEnConstruccion, 80,200,1.5)
@@ -594,7 +607,7 @@ def SeleccionarNivel():
         #opcion = Leer(415, 465, color_lectura, 1, 440, 486)
         if opcion == "5":
             break
-        elif opcion == "1" or opcion == "2":
+        elif opcion == "1" or opcion == "2" or opcion == "4":
             nivel_valido = False
             while nivel_valido == False:
                 nivel = "Ta1-a2"
@@ -603,7 +616,12 @@ def SeleccionarNivel():
                 if nivel_valido == False:
                     MostrarMensaje(imagenTableroInvalido, 50, 200, 1.5)
             tablero = MatrizDeString(nivel)
-            controlador_juego(tablero, int(opcion), 0)
+            if opcion == "1":
+                controlador_juego(tablero, int(opcion), 180, 180)
+            elif opcion == "2":
+                controlador_juego(tablero, int(opcion), 90, 90)
+            elif opcion == "4":
+                controlador_juego(tablero, int(opcion), 2, 2)
         elif opcion == "3" or opcion == "4":
             MostrarMensaje(imagenEnConstruccion, 100,200, 1.5)
         else:
