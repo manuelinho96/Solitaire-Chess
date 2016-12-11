@@ -616,6 +616,7 @@ def controlador_juego(tablero, dificultad, tiempoinicial, tiempofinal):
 #Funcion que maneja el menu de seleccionar nivel
 def SeleccionarNivel():
     #Precondicion: True
+    opcion_entrada = ""
     while True:
         ventana.blit(imagenFondo, (0, 0))
         dibujarMenu("seleccionarnivel", ["facil", "dificil", "muydificil", "entrenamiento", "volver"], "vertical",
@@ -626,27 +627,74 @@ def SeleccionarNivel():
         if opcion == "5":
             break
         elif opcion == "1" or opcion == "2" or opcion == "4" or opcion == "3":
-            nivel_valido = False
-            while nivel_valido == False:
-                nivel = "Ta1-a2"
-                #nivel = IntroducirNivel()
-                nivel_valido = validarString(nivel,"Introducir Nivel")
-                if nivel_valido == False:
-                    MostrarMensaje(imagenTableroInvalido, 50, 200, 1.5)
-            tablero = MatrizDeString(nivel)
-            if opcion == "1":
+            if opcion != "3":
+                while True:
+                    ventana.blit(imagenFondo, (0, 0))
+                    dibujarMenu("metododeentrada", ["teclado", "cartadesafio","volver"], "vertical", 100, 30, 200, 200, 150, 450, 200)
+                    opcion_entrada = Leer(415, 465, color_lectura, 1, 440, 486)
+                    pygame.display.update()
+                    if opcion_entrada != "1" and opcion_entrada != "2" and opcion_entrada != "5":
+                        MostrarMensaje(imagenOpcioninvalida, 100, 200, 1.5)
+                    else:
+                        break
+            if opcion_entrada == "1":
+                nivel_valido = False
+                while nivel_valido == False:
+                    nivel = "Ta1-a2"
+                    #nivel = IntroducirNivel()
+                    nivel_valido = validarString(nivel,"Introducir Nivel")
+                    if nivel_valido == False:
+                        MostrarMensaje(imagenTableroInvalido, 50, 200, 1.5)
+                tablero = MatrizDeString(nivel)
+            if opcion_entrada == "2":
+                tablero = MenuCartaDesafio()
+            if opcion == "1" and opcion_entrada != "5": #Facil
                 controlador_juego(tablero, int(opcion), 180, 180)
-            elif opcion == "2":
+            elif opcion == "2" and opcion_entrada != "5": #Dificil
                 controlador_juego(tablero, int(opcion), 90, 90)
-            elif opcion == "4":
+            elif opcion == "4" and opcion_entrada != "5": #Entrenamiento
                 controlador_juego(tablero, int(opcion), 2, 2)
-            elif opcion == "3":
+            elif opcion == "3": #Muy dificil
                 global partidas_ganadas
                 partidas_ganadas = 0
+                tablero = MatrizDeString(LeerArchivo("cartasdesafio")[random.randint(0,len(LeerArchivo("cartasdesafio")) - 1)])
                 controlador_juego(tablero, int(opcion), 120, 120)
         else:
             MostrarMensaje(imagenOpcioninvalida, 100, 200, 1.5)
     #postcondicion true
+
+
+#Funcion que dibuja el menu de seleccionar carta de desafio
+def MenuCartaDesafio():
+    # Precondicion: True
+    partidas_desafio = LeerArchivo("cartasdesafio")
+    contador = 0
+    while contador <= len(partidas_desafio):
+        # Cota: len(partidas_desafio) - contador
+        opciones = []
+        if contador > 0:
+            opciones.append("anteriores")
+        opciones.append("seleccionar")
+        if contador < len(partidas_desafio) - 1:
+            opciones.append("siguientes")
+        partida_seleccionada = partidas_desafio[contador]
+        rectangulo = pygame.Rect(149, 176, 309, 205)
+        ventana.blit(imagenFondo, (0, 0))
+        dibujarMenu("seleccionardesafio", opciones, "horizontal", 100, 20, 100, 440, 150, 500, 130)
+        ventana.blit(imagenPizarra, (100, 140))
+        pygame.draw.rect(ventana, (0, 0, 0), rectangulo)
+        DibujarTablero_miniatura(MatrizDeString(partida_seleccionada))
+        pygame.display.update()
+        opcion = Leer(416, 514, color_lectura, 1, 440, 534)
+        if opcion == "2" and (contador + 1) < len(partidas_desafio):
+            contador += 1
+        elif opcion == "0" and (contador - 1) >= 0:
+            contador -= 1
+        elif opcion == "1":
+            return MatrizDeString(partida_seleccionada)
+        else:
+            MostrarMensaje(imagenOpcioninvalida, 100, 250, 1.5)
+        # Postcondicion: True
 
 
 #funcion que determina si un string es un nivel de valido o no
