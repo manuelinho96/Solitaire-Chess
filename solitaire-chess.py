@@ -1,6 +1,7 @@
 import pygame, sys, re, time, copy
-import datetime
+import datetime, random
 from pygame.locals import *
+random.seed
 
 shift = False #variable booleana que indica el estado de la tecla shift
 bloq_mayus = False #variable booleana que indica el estado de la tecla bloq mayus del teclado
@@ -361,6 +362,8 @@ def EscribirEnArchivo(string):
 def LeerArchivo(nombre):
     with open("sources/files/" + nombre + ".txt", "r") as archivoEntrada:
         lineas = archivoEntrada.readlines()
+    for x in range(len(lineas)):
+        lineas[x] = lineas[x].split("\n")[0]
     return lineas
 
 
@@ -492,6 +495,7 @@ def controlador_juego(tablero, dificultad, tiempoinicial, tiempofinal):
     opciones = ["jugar"]
     ganador = False
     perdedor = False
+    global partidas_ganadas
     # configuraciones de dificultad
     if dificultad == 1 or dificultad == 4:
         opciones.append("deshacer")
@@ -503,7 +507,6 @@ def controlador_juego(tablero, dificultad, tiempoinicial, tiempofinal):
     if dificultad == 4:
         opciones.append("solucionar")
         opciones_validas.append("5")
-
     tableroviejo = tablero
     salir = False
 
@@ -592,12 +595,23 @@ def controlador_juego(tablero, dificultad, tiempoinicial, tiempofinal):
                     MostrarMensaje(imagenJugadaInvalida, 80, 200, 1.5)
             fichas_del_tablero = [x for y in tablero for x in y if x != ""]
             ganador = VerificarGanador(fichas_del_tablero)
-            if ganador:
+            if ganador and dificultad != 3:
+                MostrarMensaje(imagenVictoria, 40, 100, 5)
+                contar_tiempo = False
+                break
+            if ganador and dificultad == 3 and partidas_ganadas < 2:
+                partidas_ganadas += 1
+                partidas_desafio = LeerArchivo("cartasdesafio")
+                tablero = MatrizDeString(partidas_desafio[random.randint(0,len(partidas_desafio)-1)])
+                controlador_juego(tablero, 3, tiempo_actual, 120)
+                break
+            if ganador and dificultad == 3 and partidas_ganadas == 2:
                 MostrarMensaje(imagenVictoria, 40, 100, 5)
                 contar_tiempo = False
                 break
         if salir:
             break
+
 
 #Funcion que maneja el menu de seleccionar nivel
 def SeleccionarNivel():
@@ -607,11 +621,11 @@ def SeleccionarNivel():
         dibujarMenu("seleccionarnivel", ["facil", "dificil", "muydificil", "entrenamiento", "volver"], "vertical",
                     100, 30, 200, 150, 150, 450, 200)
         pygame.display.update()
-        opcion = "2"
-        #opcion = Leer(415, 465, color_lectura, 1, 440, 486)
+        #opcion = ""
+        opcion = Leer(415, 465, color_lectura, 1, 440, 486)
         if opcion == "5":
             break
-        elif opcion == "1" or opcion == "2" or opcion == "4":
+        elif opcion == "1" or opcion == "2" or opcion == "4" or opcion == "3":
             nivel_valido = False
             while nivel_valido == False:
                 nivel = "Ta1-a2"
@@ -626,8 +640,10 @@ def SeleccionarNivel():
                 controlador_juego(tablero, int(opcion), 90, 90)
             elif opcion == "4":
                 controlador_juego(tablero, int(opcion), 2, 2)
-        elif opcion == "3" or opcion == "4":
-            MostrarMensaje(imagenEnConstruccion, 100,200, 1.5)
+            elif opcion == "3":
+                global partidas_ganadas
+                partidas_ganadas = 0
+                controlador_juego(tablero, int(opcion), 120, 120)
         else:
             MostrarMensaje(imagenOpcioninvalida, 100, 200, 1.5)
     #postcondicion true
