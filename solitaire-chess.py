@@ -488,6 +488,48 @@ def MenuCargar():
     #Postcondicion: True
 
 
+#Funcion que dado un tablero solicita al usuario una posicion y devuelve una solucion.
+def EncontrarPosicionValida(tablero, titulo_menu):
+    #Precondicion: True
+    while True:
+        DibujarInterfaz(tablero, titulo_menu)
+        ventana.blit(imagenIntroducirCasillas, (200, 410))
+        pygame.display.update()
+        casilla_inicial = Leer(354, 446, (color_lectura), 2, 354 + 33, 446 + 20)
+        valida = True
+        if validarString(casilla_inicial, "Introducir Casilla"):
+            casilla_inicialx = ord(casilla_inicial[0]) - 97
+            casilla_inicialy = int(casilla_inicial[1]) - 1
+            if tablero[casilla_inicialx][casilla_inicialy] == "":
+                valida = False
+                MostrarMensaje(imagenJugadaInvalida, 80, 200, 1.5)
+        else:
+            valida = False
+            MostrarMensaje(imagenJugadaInvalida, 80, 200, 1.5)
+        ficha = tablero[casilla_inicialx][casilla_inicialy]
+        if valida and ficha == "R":
+            posiciones_validas = PosicionesValidasRey(casilla_inicialx, casilla_inicialy, tablero)
+            if len(posiciones_validas) > 0:
+                return posiciones_validas[random.randint(0,len(posiciones_validas)-1)]
+        if valida and (ficha == "A" or ficha == "D"):
+            posiciones_validas = PosicionesValidasAlfil(casilla_inicialx, casilla_inicialy, tablero, False)
+            if len(posiciones_validas) > 0:
+                return posiciones_validas[random.randint(0, len(posiciones_validas)-1)]
+        if valida and (ficha == "T" or ficha == "D"):
+            posiciones_validas = PosicionesValidasTorre(casilla_inicialx, casilla_inicialy, tablero)
+            if len(posiciones_validas) > 0:
+                return posiciones_validas[random.randint(0, len(posiciones_validas)-1)]
+        if valida and ficha == "C":
+            posiciones_validas = PosicionesValidasCaballo(casilla_inicialx, casilla_inicialy, tablero)
+            if len(posiciones_validas) > 0:
+                return posiciones_validas[random.randint(0, len(posiciones_validas)-1)]
+        if valida and ficha == "P":
+            posiciones_validas = PosicionesValidasAlfil(casilla_inicialx, casilla_inicialy, tablero, True)
+            if len(posiciones_validas) > 0:
+                return posiciones_validas[random.randint(0, len(posiciones_validas)-1)]
+        return None
+
+
 
 #Funcion que muestra el menu de terminar una partida
 def TerminarPartida(tablero, dificultad):
@@ -570,7 +612,8 @@ def controlador_juego(tablero, dificultad, tiempoinicial, tiempofinal):
         if opcion == "4":
             salir = TerminarPartida(tablero, dificultad)
         if opcion == "5":
-            MostrarMensaje(imagenEnConstruccion, 80,200,1.5)
+            posicion_valida = EncontrarPosicionValida(tablero, titulo_menu)
+            print(posicion_valida)
         if opcion == "3":
             pausar_juego()
         if opcion == "2":
@@ -1127,6 +1170,7 @@ imagenFondoCronometro = pygame.image.load(direccion_imagenes + "fondocronometro.
 imagenPausa =  pygame.image.load(direccion_imagenes + "juegopausado.png")
 imagenContinuar = pygame.image.load(direccion_imagenes + "continuar.png")
 imagenPizarra = pygame.transform.scale(pygame.image.load(direccion_imagenes + "pizarra.png"), (400,280))
+imagenCasillaInicial = pygame.transform.scale(pygame.image.load(direccion_imagenes + "casillainicial.png"), (200,100))
 fuente = pygame.font.Font(None, 28)
 fuente_prueba = pygame.font.Font(None, 18)
 
