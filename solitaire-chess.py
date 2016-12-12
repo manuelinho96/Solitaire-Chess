@@ -354,7 +354,7 @@ def StringDeTablero(tablero):
     return string
 
 #Funcion que escribe informacion acerca de una partida guardada
-def EscribirEnArchivo(string):
+def EscribirEnArchivoPartidaGuardada(string):
     with open("sources/files/partidasguardadas.txt", "a") as archivoSalida:
         archivoSalida.write(string)
 
@@ -388,7 +388,7 @@ def GuardarPartida(tablero, dificultad):
             if dificultad == 3:
                 string += "victorias:" + str(partidas_ganadas)
             string += "\n"
-            EscribirEnArchivo(string)
+            EscribirEnArchivoPartidaGuardada(string)
             break
         elif opcion == "2":
             break
@@ -662,6 +662,8 @@ def controlador_juego(tablero, dificultad, tiempoinicial, tiempofinal):
             if ganador and dificultad != 3:
                 MostrarMensaje(imagenVictoria, 40, 100, 5)
                 contar_tiempo = False
+                if dificultad != 4:
+                    Controlador_Records(dificultad)
                 break
             if ganador and dificultad == 3 and partidas_ganadas < 2:
                 partidas_ganadas += 1
@@ -671,6 +673,7 @@ def controlador_juego(tablero, dificultad, tiempoinicial, tiempofinal):
                 break
             if ganador and dificultad == 3 and partidas_ganadas == 2:
                 MostrarMensaje(imagenVictoria, 40, 100, 5)
+                Controlador_Records(dificultad)
                 contar_tiempo = False
                 break
         if salir:
@@ -966,6 +969,26 @@ def PosicionesValidasTorre(xorigen, yorigen, tablero):
     #Postcondicion: True
 
 
+def EscribirEnArchivoRecords(records, dificultad):
+    with open("sources/files/records" + str(dificultad) + ".txt", "w") as archivoRecords:
+        for record in records:
+            archivoRecords.write(record + "\n")
+
+
+def Controlador_Records(dificultad):
+    #precondicion true
+    lista_records = LeerArchivo("records" + str(dificultad))
+    indice_jugador = -1
+    for i in range(len(lista_records)):
+        if lista_records[i].split(":")[0] == nombre_jugador:
+            indice_jugador = i
+    if indice_jugador == -1:
+        lista_records.append(nombre_jugador + ":1")
+    else:
+        lista_records[indice_jugador] = nombre_jugador + ":" + str(int(lista_records[i].split(":")[1]) + 1)
+    EscribirEnArchivoRecords(lista_records, dificultad)
+    #postcondicion true
+
 
 def PosicionesValidasAlfil(xorigen, yorigen, tablero, espeon):
     #Precondicion: True
@@ -1066,12 +1089,64 @@ def MatrizDeString(string):
     #postcondicion true
     return matriz
 
+def PantallaRecords():
+    opcion_vieja = ""
+    opcion = "1"
+    while True:
+        ventana.blit(imagenFondo, (0, 0))
+        dificultades = ["Facil", "Dificil", "Muy Dificil", "volver"]
+        dibujarMenu("tableroderecords", ["facil", "dificil", "muydificil", "volver"], "horizontal", 100, 20, 90, 430,
+                    150,
+                    500, 100)
+        ventana.blit(imagenPizarra, (100, 130))
+        pygame.draw.rect(ventana, (0,0,0), (149, 167, 309, 205))
+        if opcion == "1" or opcion == "2" or opcion == "3":
+            pygame.draw.rect(ventana, (255, 255, 0), (90 + ((int(opcion) - 1) * 105), 430, 100, 50), 5)
+            lista_records = LeerArchivo("records" + opcion)
+            lista_ordenada = []
+            #ordernando la lista de records por cantidad de victorias y luego por orden alfanumerico del nombre
+            for i in range(len(lista_records)):
+                while len(lista_ordenada) < int(lista_records[i].split(":")[1]):
+                    lista_ordenada.append([])
+            #ordenados por cantidad de victorias
+            for i in range(len(lista_records)):
+                lista_ordenada[int(lista_records[i].split(":")[1]) - 1].append(lista_records[i].split(":")[0])
+            #ordenados por nombre en caso de empates
+            for i in range(len(lista_ordenada)):
+                lista_ordenada[i].sort()
+            imagenDificultad = fuente.render(dificultades[int(opcion) - 1] + ":", 1, (255,255,0))
+            #renderizado del texto de todos los records
+            lista_imagenes_texto = []
+            for x in range(len(lista_ordenada)):
+                victorias = len(lista_ordenada) - x -1
+                for jugador in range(len(lista_ordenada[victorias])):
+                    if x == 0 and jugador == 0:
+                        lista_imagenes_texto.append(fuente.render(lista_ordenada[victorias][jugador] + ": " +
+                                                                  str(victorias + 1) + " Victorias", 1, (200, 200, 120)))
+                    else:
+                        lista_imagenes_texto.append(
+                            fuente.render(lista_ordenada[victorias][jugador] + ": " + str(victorias + 1) + " Victorias", 1,
+                                          (255, 255, 255)))
+            #escritura del record
+            for y in range(len(lista_imagenes_texto[:9])):
+                ventana.blit(lista_imagenes_texto[y], (156, 190 + (20 * y)))
+            ventana.blit(imagenDificultad, (156, 174))
+        pygame.display.update()
+        opcion_vieja = opcion
+        opcion = Leer(415, 515, (0, 0, 0), 1, 440, 534)
+        if opcion == "5":
+            break
+        elif opcion != "1" and opcion != "2" and opcion != "3":
+            MostrarMensaje(imagenOpcioninvalida, 100, 100, 1.5)
+            opcion = opcion_vieja
+
+
 #funcion que maneja el menu principal
 def MenuPrincipal():
     #precondicion true
     #mostrar opciones al usuario
     while True:
-        ventana.blit(imagenFondo, (0,0))
+        ventana.blit(imagenFondo, (0, 0))
         ventana.blit(imagenTitulo, (150, 20))
         dibujarMenu("menuprincipal", ["partidanueva", "cargarpartida", "mostrarrecords", "salirjuego"], "vertical",
                     100, 180, 200, 300, 150, 540, 200)
@@ -1083,7 +1158,7 @@ def MenuPrincipal():
         elif opcion == "2":
             MenuCargar()
         elif opcion == "3":
-            MostrarMensaje(imagenEnConstruccion, 80, 200, 2)
+            PantallaRecords()
         elif opcion == "4":
             ConfirmacionSalida()
         else:
@@ -1195,5 +1270,5 @@ cambiomin_x = 69
 cambiomin_y = 32
 #MostrarTutorial()
 nombre_jugador = "joseesloco"
-#nombre_jugador = IntroducirNombre()
+nombre_jugador = IntroducirNombre()
 MenuPrincipal()
