@@ -493,9 +493,9 @@ def EncontrarPosicionValida(tablero, titulo_menu):
     #Precondicion: True
     while True:
         DibujarInterfaz(tablero, titulo_menu)
-        ventana.blit(imagenIntroducirCasillas, (200, 410))
+        ventana.blit(imagenCasillaInicial, (200, 410))
         pygame.display.update()
-        casilla_inicial = Leer(354, 446, (color_lectura), 2, 354 + 33, 446 + 20)
+        casilla_inicial = Leer(354, 467, (color_lectura), 2, 388, 498)
         valida = True
         if validarString(casilla_inicial, "Introducir Casilla"):
             casilla_inicialx = ord(casilla_inicial[0]) - 97
@@ -558,6 +558,8 @@ def controlador_juego(tablero, dificultad, tiempoinicial, tiempofinal):
     opciones = ["jugar"]
     ganador = False
     perdedor = False
+    ayuda = False
+    posicion_valida = []
     global partidas_ganadas
     # configuraciones de dificultad
     if dificultad == 1 or dificultad == 4:
@@ -572,7 +574,6 @@ def controlador_juego(tablero, dificultad, tiempoinicial, tiempofinal):
         opciones_validas.append("5")
     tableroviejo = tablero
     salir = False
-
     #configuraciones del tiempo
     global tiempo_maximo
     global contar_tiempo
@@ -597,6 +598,20 @@ def controlador_juego(tablero, dificultad, tiempoinicial, tiempofinal):
         pygame.draw.rect(ventana, (0, 0, 0), rectangulo)
         texto = fuente.render(nombre_jugador, 1, (255, 120, 255))
         ventana.blit(texto, (385,145))
+        if ayuda:
+            if posicion_valida != None:
+                ventana.blit(pygame.image.load(direccion_imagenes + "cuadronombre.png"), (360, 345))
+                rectangulo = pygame.Rect(382, 364, 186, 24)
+                pygame.draw.rect(ventana, (0, 0, 0), rectangulo)
+                texto = fuente.render("Solucion: " + chr(posicion_valida[0] + 97) + str(posicion_valida[1] + 1), 1, (255, 120, 255))
+                ventana.blit(texto, (385, 368))
+            else:
+                ventana.blit(pygame.image.load(direccion_imagenes + "cuadronombre.png"), (360, 345))
+                rectangulo = pygame.Rect(382, 364, 186, 24)
+                pygame.draw.rect(ventana, (0, 0, 0), rectangulo)
+                texto = fuente.render("Solucion: -", 1, (255, 120, 255))
+                ventana.blit(texto, (385, 368))
+            ayuda = False
         pygame.display.update()
         if perdedor:
             MostrarMensaje(imagenDerrota, 130, 100, 5)
@@ -611,12 +626,12 @@ def controlador_juego(tablero, dificultad, tiempoinicial, tiempofinal):
             MostrarMensaje(imagenOpcioninvalida, 100,200, 1.5)
         if opcion == "4":
             salir = TerminarPartida(tablero, dificultad)
-        if opcion == "5":
+        if opcion == "5" and "5" in opciones_validas:
+            ayuda = True
             posicion_valida = EncontrarPosicionValida(tablero, titulo_menu)
-            print(posicion_valida)
-        if opcion == "3":
+        if opcion == "3" and "3" in opciones_validas:
             pausar_juego()
-        if opcion == "2":
+        if opcion == "2" and "2" in opciones_validas:
             tablero = tableroviejo
             MostrarMensaje(imagenDeshacerJugada, 80, 200, 1.5)
         if opcion == "1":
@@ -689,7 +704,6 @@ def SeleccionarNivel():
         dibujarMenu("seleccionarnivel", ["facil", "dificil", "muydificil", "entrenamiento", "volver"], "vertical",
                     100, 30, 200, 150, 150, 450, 200)
         pygame.display.update()
-        #opcion = ""
         opcion = Leer(415, 465, color_lectura, 1, 440, 486)
         if opcion == "5":
             break
@@ -707,8 +721,7 @@ def SeleccionarNivel():
             if opcion_entrada == "1":
                 nivel_valido = False
                 while nivel_valido == False:
-                    nivel = "Ta1-a2"
-                    #nivel = IntroducirNivel()
+                    nivel = IntroducirNivel()
                     nivel_valido = validarString(nivel,"Introducir Nivel")
                     if nivel_valido == False:
                         MostrarMensaje(imagenTableroInvalido, 50, 200, 1.5)
@@ -915,7 +928,10 @@ def MoverFicha(fila, columna, filafinal, columnafinal, tablero, ficha):
         y_actual = (yf - y) * i + y
         DibujarInterfaz(tablero,titulo_menu)
         DibujarFicha(ficha, x_actual, y_actual)
-        dibujarCronometro()
+        if contar_tiempo:
+            dibujarCronometro()
+        else:
+            pygame.display.update()
         if int(tiempo_viejo) < pygame.time.get_ticks()/1000:
             tiempo_viejo += 1
     # postcondicion True
@@ -995,7 +1011,11 @@ def PosicionesValidasAlfil(xorigen, yorigen, tablero, espeon):
     posiciones_validas = []
     if espeon:
         distanciamaxima = xorigen+2
+        if distanciamaxima >= 4:
+            distanciamaxima = 4
         distanciamaxima2 = xorigen-1
+        if distanciamaxima2 <= 0:
+            distanciamaxima2 = 0
     else:
         distanciamaxima = 4
         distanciamaxima2 = 0
@@ -1151,7 +1171,6 @@ def MenuPrincipal():
         dibujarMenu("menuprincipal", ["partidanueva", "cargarpartida", "mostrarrecords", "salirjuego"], "vertical",
                     100, 180, 200, 300, 150, 540, 200)
         pygame.display.update()
-        #opcion = "2"
         opcion = Leer(415,555, color_lectura,1,440,575)
         if opcion == "1":
             SeleccionarNivel()
@@ -1268,7 +1287,7 @@ x_miniatura = 187
 y_miniatura = 316
 cambiomin_x = 69
 cambiomin_y = 32
-#MostrarTutorial()
-nombre_jugador = "joseesloco"
+
+MostrarTutorial()
 nombre_jugador = IntroducirNombre()
 MenuPrincipal()
