@@ -614,7 +614,10 @@ def controlador_juego(tablero, dificultad, tiempoinicial, tiempofinal):
             ayuda = False
         pygame.display.update()
         if perdedor:
-            MostrarMensaje(imagenDerrota, 130, 100, 5)
+            bgm.stop()
+            lose.play()
+            MostrarMensaje(imagenDerrota, 130, 100, 6)
+            bgm.play(-1)
             contar_tiempo = False
             break
         opcion = Leer(285, 495, color_lectura, 1, 311, 514)
@@ -675,7 +678,11 @@ def controlador_juego(tablero, dificultad, tiempoinicial, tiempofinal):
             fichas_del_tablero = [x for y in tablero for x in y if x != ""]
             ganador = VerificarGanador(fichas_del_tablero)
             if ganador and dificultad != 3:
-                MostrarMensaje(imagenVictoria, 40, 100, 5)
+                time.sleep(1)
+                bgm.stop()
+                win.play()
+                MostrarMensaje(imagenVictoria, 40, 100, 6)
+                bgm.play(-1)
                 contar_tiempo = False
                 if dificultad != 4:
                     Controlador_Records(dificultad)
@@ -934,6 +941,7 @@ def MoverFicha(fila, columna, filafinal, columnafinal, tablero, ficha):
             pygame.display.update()
         if int(tiempo_viejo) < pygame.time.get_ticks()/1000:
             tiempo_viejo += 1
+    coin.play()
     # postcondicion True
 
 
@@ -1287,6 +1295,14 @@ x_miniatura = 187
 y_miniatura = 316
 cambiomin_x = 69
 cambiomin_y = 32
+
+
+pygame.mixer.init()
+bgm = pygame.mixer.Sound("sources/sounds/overworld.wav")
+coin = pygame.mixer.Sound("sources/sounds/coin.wav")
+win = pygame.mixer.Sound("sources/sounds/win.wav")
+lose = pygame.mixer.Sound("sources/sounds/lose.wav")
+bgm.play(-1)
 
 MostrarTutorial()
 nombre_jugador = IntroducirNombre()
