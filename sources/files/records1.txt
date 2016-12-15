@@ -4,3 +4,4 @@ pedrito:3
 Temet:2
 Lokho:3
 temet:1
+manuel:3

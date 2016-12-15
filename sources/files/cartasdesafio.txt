@@ -1,1 +1,8 @@
-Ta1-a2-Rd4-Dc3-Ca3-Aa4-b1-Tb2-Rc4-d1-Ad2-Cd3-b3-b4-Rc2-Ac1
+Ta1-Rd4-Aa4-Cc1-Db2
+Ra1-Cb3-Da1-Ad4-Ta4
+Cb4-a2-Tb2-Ad4-Ra1-c1
+Aa1-b1-Ab2-Tc2-Rd2-Cc3-Dd4
+d3-Ac4-Ab3-Db4-Ra2-Ta1
+a1-Ta2-Ab1-Db2-Cc2-c1-Rd3-Cd4
+Ab2-c1-Rb1-Aa3-Rb4-Tb3-Cd4
+
