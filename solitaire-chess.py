@@ -545,8 +545,11 @@ def TerminarPartida(tablero, dificultad):
             GuardarPartida(tablero, dificultad)
             return True
         elif opcion == "2":
-            contar_tiempo = True
-            break
+            if dificultad != 4:
+                contar_tiempo = True
+                break
+            else:
+                break
         else:
             MostrarMensaje(imagenOpcioninvalida, 100, 250, 1.5)
     #Postcondicion: True
@@ -626,7 +629,10 @@ def controlador_juego(tablero, dificultad, tiempoinicial, tiempofinal):
             break
         opcion = Leer(285, 495, color_lectura, 1, 311, 514)
         if opcion == "perdida_por_tiempo":
-            MostrarMensaje(imagenDerrota, 130, 100, 5)
+            bgm.stop()
+            lose.play()
+            MostrarMensaje(imagenDerrota, 130, 100, 6)
+            bgm.play(-1)
             contar_tiempo = False
             break
         if opcion not in opciones_validas:
@@ -923,7 +929,8 @@ def DibujarTablero_miniatura(tablero):
         for columna in range(columnas):
             # se trabaja con la posicion columnas - columna para que se dibujen de arriba a abajo
             pos_columna = columnas - 1 - columna
-            DibujarFichamMiniatura(tablero[fila][pos_columna], x_miniatura + (fila * cambiomin_x),
+            if tablero[fila][pos_columna] != "":
+                DibujarFichamMiniatura(tablero[fila][pos_columna], x_miniatura + (fila * cambiomin_x),
                                    y_miniatura - (pos_columna * cambiomin_y))
     # postcondicion: True
 
