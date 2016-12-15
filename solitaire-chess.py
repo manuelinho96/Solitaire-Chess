@@ -553,6 +553,10 @@ def TerminarPartida(tablero, dificultad):
 
 
 def controlador_juego(tablero, dificultad, tiempoinicial, tiempofinal):
+    #precondicion el tablero debe ser una matriz 4x4, la dificultad debe estar entre 1 y 4,
+    #tempo inicial y tiempo final no deben ser negativos
+    assert(len(tablero) == 4 and all(len(x) == 4 for x in tablero) and dificultad >= 1 and dificultad <= 4
+           and tiempoinicial >= 0 and tiempofinal >= 0)
     titulo_menu = pygame.transform.scale(pygame.image.load("sources/sprites/menujuego.png"), (400, 100))
     opciones_validas = ["1", "4"]
     opciones = ["jugar"]
@@ -700,6 +704,7 @@ def controlador_juego(tablero, dificultad, tiempoinicial, tiempofinal):
                 break
         if salir:
             break
+    #postcondicion: True
 
 
 #Funcion que maneja el menu de seleccionar nivel
@@ -851,9 +856,12 @@ def ConfirmacionSalida():
             break
         else:
             MostrarMensaje(imagenOpcioninvalida, 100, 250, 1.5)
+    #postcondicion: True
 
 
 def DibujarFicha(ficha, x, y):
+    #precondicion ficha debe ser una ficha validad, tanto x, y deben estar entre 0 y 600
+    assert(ficha in ["R", "D", "A", "C", "T", "P"] and x >= 0 and x <= 600 and y >= 0 and y <= 600)
     if ficha == "R":
         ventana.blit(imagenRey, (x,y))
     elif ficha == "D":
@@ -866,8 +874,11 @@ def DibujarFicha(ficha, x, y):
         ventana.blit(imagenTorre, (x,y))
     elif ficha == "P":
         ventana.blit(imagenPeon, (x,y))
+    #postcondicion: True
 
 def DibujarFichamMiniatura(ficha, x, y):
+    # precondicion ficha debe ser una ficha validad, tanto x, y deben estar entre 0 y 600
+    assert (ficha in ["R", "D", "A", "C", "T", "P"] and x >= 0 and x <= 600 and y >= 0 and y <= 600)
     if ficha == "R":
         ventana.blit(imagenReymini, (x,y))
     elif ficha == "D":
@@ -880,10 +891,13 @@ def DibujarFichamMiniatura(ficha, x, y):
         ventana.blit(imagenTorremini, (x,y))
     elif ficha == "P":
         ventana.blit(imagenPeonmini, (x,y))
+    #postcondicion True
 
 
 #Funcion que dado un tablero lo dibuja en la interfaz grafica.
 def DibujarTablero(tablero):
+    #precondicion tablero debe ser una matriz 4 x 4
+    assert(len(tablero)  == 4 and all(len(x) == 4 for x in tablero))
     filas = len(tablero)
     columnas = len(tablero[0])
     ventana.blit(imagenFondo, (0,0))
@@ -892,11 +906,15 @@ def DibujarTablero(tablero):
         for columna in range(columnas):
             # se trabaja con la posicion columnas - columna para que se dubijen de arriba a abajo
             pos_columna = columnas - 1 - columna
-            DibujarFicha(tablero[fila][pos_columna], x_fichas + (fila * cambio_x), y_fichas - (pos_columna * cambio_y))
+            if tablero[fila][pos_columna] != "":
+                DibujarFicha(tablero[fila][pos_columna], x_fichas + (fila * cambio_x), y_fichas - (pos_columna * cambio_y))
+    #postcondicion: True
 
 
 #Funcion que dado un tablero dibuja su version en miniatura.
 def DibujarTablero_miniatura(tablero):
+    # precondicion tablero debe ser una matriz 4 x 4
+    assert (len(tablero) == 4 and all(len(x) == 4 for x in tablero))
     filas = len(tablero)
     columnas = len(tablero[0])
     imagentablero =  pygame.transform.scale(pygame.image.load(direccion_imagenes + "tablero.png"), (310,150))
@@ -907,10 +925,16 @@ def DibujarTablero_miniatura(tablero):
             pos_columna = columnas - 1 - columna
             DibujarFichamMiniatura(tablero[fila][pos_columna], x_miniatura + (fila * cambiomin_x),
                                    y_miniatura - (pos_columna * cambiomin_y))
+    # postcondicion: True
 
 
 # funcion que controla la animacion de mover una ficha de una casilla a otra, controlado en pixeles
 def MoverFicha(fila, columna, filafinal, columnafinal, tablero, ficha):
+    #precondicion: fila, columna, filafinal, columnafinal deben estar entre 0 y 3, tablero debe ser matriz 4x4
+    #ficha debe ser una ficha valida
+    assert (len(tablero)  == 4 and all(len(x) == 4 for x in tablero) and ficha in ["R", "D", "A", "C", "T", "P"] and
+            fila >= 0 and fila <= 3 and columna >= 0 and columna <= 3 and filafinal >= 0 and filafinal <= 3 and
+            columnafinal >= 0 and columnafinal <= 3)
     titulo_menu = pygame.transform.scale(pygame.image.load("sources/sprites/menujuego.png"), (400, 100))
     tiempo_inicio = pygame.time.get_ticks()
     tablero[fila][columna] = ""
@@ -947,6 +971,9 @@ def MoverFicha(fila, columna, filafinal, columnafinal, tablero, ficha):
 
 def PosicionesValidasCaballo(xorigen, yorigen, tablero):
     posiciones_validas = []
+    #xorigen, yorigen deben estar entre 0 y 3, tablero debe ser una matriz 4x4
+    assert(len(tablero) == 4 and all(len(x) == 4 for x in tablero) and xorigen >= 0 and xorigen <= 3 and yorigen >= 0
+           and yorigen <= 3)
     if xorigen >= 2 :
         if yorigen > 0 and tablero[xorigen - 2][yorigen - 1] != "":
             posiciones_validas.append((xorigen - 2, yorigen - 1))
@@ -967,11 +994,14 @@ def PosicionesValidasCaballo(xorigen, yorigen, tablero):
             posiciones_validas.append((xorigen - 1, yorigen + 2))
         if xorigen < 3 and tablero[xorigen + 1][yorigen + 2] != "":
             posiciones_validas.append((xorigen + 1, yorigen + 2))
+    #postcondicion...
     return posiciones_validas
 
 
 def PosicionesValidasTorre(xorigen, yorigen, tablero):
-    #Precondicion: True
+    #Precondicion: xorigen e yorigen deben estar entre 0 y 3, tablero ser matriz 4 x4
+    assert(xorigen >= 0 and xorigen <= 3 and yorigen >= 0 and yorigen <= 3 and
+           len(tablero) == 4 and all(len(x) == 4 for x in tablero))
     posiciones_validas = []
     for x in range(xorigen+1,4):
         if BusquedaHorizontal(xorigen, x, yorigen, "derecha", tablero):
@@ -994,13 +1024,16 @@ def PosicionesValidasTorre(xorigen, yorigen, tablero):
 
 
 def EscribirEnArchivoRecords(records, dificultad):
+    #precondicion: dificultad entre 1 y 3
+    assert(dificultad >= 1 and dificultad <= 3)
     with open("sources/files/records" + str(dificultad) + ".txt", "w") as archivoRecords:
         for record in records:
             archivoRecords.write(record + "\n")
 
 
 def Controlador_Records(dificultad):
-    #precondicion true
+    # precondicion: dificultad entre 1 y 3
+    assert (dificultad >= 1 and dificultad <= 3)
     lista_records = LeerArchivo("records" + str(dificultad))
     indice_jugador = -1
     for i in range(len(lista_records)):
@@ -1015,7 +1048,8 @@ def Controlador_Records(dificultad):
 
 
 def PosicionesValidasAlfil(xorigen, yorigen, tablero, espeon):
-    #Precondicion: True
+    assert (xorigen >= 0 and xorigen <= 3 and yorigen >= 0 and yorigen <= 3 and
+            len(tablero) == 4 and all(len(x) == 4 for x in tablero))
     posiciones_validas = []
     if espeon:
         distanciamaxima = xorigen+2
@@ -1049,7 +1083,8 @@ def PosicionesValidasAlfil(xorigen, yorigen, tablero, espeon):
 
 
 def PosicionesValidasRey(xorigen,yorigen,tablero):
-    #Precondicion:
+    assert (xorigen >= 0 and xorigen <= 3 and yorigen >= 0 and yorigen <= 3 and
+            len(tablero) == 4 and all(len(x) == 4 for x in tablero))
     posiciones_validas = []
     if yorigen != 0:
         yinicio = yorigen-1
@@ -1118,6 +1153,7 @@ def MatrizDeString(string):
     return matriz
 
 def PantallaRecords():
+    #precondicion true
     opcion_vieja = ""
     opcion = "1"
     while True:
@@ -1167,6 +1203,7 @@ def PantallaRecords():
         elif opcion != "1" and opcion != "2" and opcion != "3":
             MostrarMensaje(imagenOpcioninvalida, 100, 100, 1.5)
             opcion = opcion_vieja
+    #postcondicion: true
 
 
 #funcion que maneja el menu principal
@@ -1193,22 +1230,26 @@ def MenuPrincipal():
         #postcondicion: true
 
 def FormatearFicha(imagen):
+    #pre y postcondicion: True
     return pygame.transform.scale(imagen, (50,90))
 
 
 #funcion que un mensaje especial
 def MostrarMensaje(imagen, x,y, tiempo):
+    #pre y postcondicion: true
     ventana.blit(imagen, (x,y))
     pygame.display.update()
     time.sleep(tiempo)
 
 
 def IntroducirNombre():
+    #precondicion: True
     ventana.blit(imagenFondo, (0, 0))
     ventana.blit(pygame.image.load(direccion_imagenes + "cuadronombre.png"), (180, 396))
     ventana.blit(imagenNombre, (100, 40))
     ventana.blit(pygame.image.load(direccion_imagenes + "maximo10caracteres.png"), (88,240))
     nombre = Leer(200, 415, color_lectura, 10, 386,440)
+    #postcondicion: True
     return nombre
 
 #Funcion que indica al usuario como realizar sus acciones.
