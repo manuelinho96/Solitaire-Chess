@@ -7,3 +7,6 @@ Partida:6 FECHA:11/12/2016 TIEMPO:178 facil Ta1-a2 joseesloco
 Partida:7 FECHA:11/12/2016 TIEMPO:178 facil Ta1-a2 joseesloco
 Partida:8 FECHA:11/12/2016 TIEMPO:999 muy_dificil Ta1-a2 joseesloco victorias:2
 Partida:10 FECHA:11/12/2016 TIEMPO:997 muy_dificil Ta1-a2 joseesloco victorias:2
+Partida:10 FECHA:15/12/2016 TIEMPO:169 facil Ta1-a2 adsa
+Partida:11 FECHA:15/12/2016 TIEMPO:61 dificil Ta1-Aa4-Dc1-Rd4 adsa
+Partida:12 FECHA:15/12/2016 TIEMPO:147 facil Ta1-Aa4-Db2-Cc1-Rd4 adsa
