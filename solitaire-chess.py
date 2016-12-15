@@ -698,7 +698,10 @@ def controlador_juego(tablero, dificultad, tiempoinicial, tiempofinal):
                 controlador_juego(tablero, 3, tiempo_actual, 120)
                 break
             if ganador and dificultad == 3 and partidas_ganadas == 2:
+                bgm.stop()
+                win.play()
                 MostrarMensaje(imagenVictoria, 40, 100, 5)
+                bgm.play(-1)
                 Controlador_Records(dificultad)
                 contar_tiempo = False
                 break
