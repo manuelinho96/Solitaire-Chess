@@ -710,8 +710,8 @@ def controlador_juego(tablero, dificultad, tiempoinicial, tiempofinal):
 #Funcion que maneja el menu de seleccionar nivel
 def SeleccionarNivel():
     #Precondicion: True
-    opcion_entrada = ""
     while True:
+        opcion_entrada = ""
         ventana.blit(imagenFondo, (0, 0))
         dibujarMenu("seleccionarnivel", ["facil", "dificil", "muydificil", "entrenamiento", "volver"], "vertical",
                     100, 30, 200, 150, 150, 450, 200)
