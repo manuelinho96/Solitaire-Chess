@@ -923,7 +923,8 @@ def DibujarTablero_miniatura(tablero):
         for columna in range(columnas):
             # se trabaja con la posicion columnas - columna para que se dibujen de arriba a abajo
             pos_columna = columnas - 1 - columna
-            DibujarFichamMiniatura(tablero[fila][pos_columna], x_miniatura + (fila * cambiomin_x),
+            if tablero[fila][pos_columna] != "":
+                DibujarFichamMiniatura(tablero[fila][pos_columna], x_miniatura + (fila * cambiomin_x),
                                    y_miniatura - (pos_columna * cambiomin_y))
     # postcondicion: True
 
